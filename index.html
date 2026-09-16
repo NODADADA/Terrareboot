@@ -1,24 +1,10 @@
 <!DOCTYPE html>
-<!--
-  이 파일은 그대로 GitHub Pages에 올려서 바로 쓸 수 있는 템플릿입니다.
-
-  [사용법]
-  1. GitHub에 새 레포지토리를 만들고 이 파일을 index.html 이름 그대로 루트에 올립니다.
-  2. 레포 Settings → Pages → Branch를 main(또는 master)으로 설정하면
-     https://아이디.github.io/레포이름 주소로 몇 분 안에 공개됩니다.
-  3. 아래 [편집 지점] 주석이 붙은 부분들을 실제 게임 정보로 바꿔주세요.
-     - 게임 이름 / 한 줄 소개: <header class="hero"> 안
-     - 컨셉 설명 문단: #concept 섹션
-     - 개발 일지 항목들: #devlog 섹션 (실제 있었던 순서/날짜로 바꾸세요)
-     - 스크린샷: #gallery 섹션의 .shot-slot 을 <img src="..."> 로 교체
-     - 외부 링크: #follow 섹션의 href="#" 부분
--->
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>[게임 이름] — 개발 이야기</title>
-<meta name="description" content="[게임 이름]의 컨셉과 개발 과정을 소개합니다.">
+<title>[게임 이름] — 공식 사이트</title>
+<meta name="description" content="[게임 이름] — 게임 소개, 캐릭터, 세계관, 플레이 정보">
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -26,388 +12,448 @@
 <link rel="stylesheet" as="style" crossorigin
       href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.css">
 
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css">
+
 <style>
   :root{
-    --bg: #F1EEE4;
-    --bg-alt: #E7E2D2;
-    --ink: #1E1C18;
-    --ink-soft: #5B564C;
-    --accent: #2F5233;
+    --bg: #0F0E0C;
+    --bg-alt: #1A1815;
+    --panel: #211E1A;
+    --ink: #F1EEE4;
+    --ink-soft: #A9A296;
+    --accent: #C79B4A;
     --accent-soft: #7C9473;
     --gold: #A9773A;
-    --line: #D3CBB4;
+    --line: #3A342B;
     --font-display: 'Gowun Batang', serif;
     --font-body: 'PretendardVariable', -apple-system, BlinkMacSystemFont, 'Malgun Gothic', sans-serif;
-    --max-w: 760px;
   }
 
-  *{ box-sizing: border-box; }
-  html{ scroll-behavior: smooth; }
+  *{ box-sizing: border-box; margin: 0; padding: 0; }
+  html, body{ height: 100%; overflow: hidden; }
   body{
-    margin:0;
     background: var(--bg);
     color: var(--ink);
     font-family: var(--font-body);
     line-height: 1.7;
     -webkit-font-smoothing: antialiased;
   }
-  ::selection{ background: var(--accent-soft); color: #fff; }
+  ::selection{ background: var(--accent); color: #000; }
 
-  a{ color: var(--accent); }
-  a:focus-visible, button:focus-visible{
-    outline: 2px solid var(--accent);
-    outline-offset: 3px;
-  }
+  a{ color: var(--accent); text-decoration: none; }
 
-  .wrap{
-    max-width: var(--max-w);
-    margin: 0 auto;
-    padding: 0 24px;
+  /* ---------- 상단 탭 (GNB) ---------- */
+  .gnb{
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 50;
+    padding: 20px 40px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: linear-gradient(180deg, rgba(15,14,12,.85) 0%, rgba(15,14,12,0) 100%);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
   }
-
-  /* ---------- Hero ---------- */
-  .hero{
-    padding: 96px 0 72px;
-    border-bottom: 1px solid var(--line);
+  .brand{
+    font-family: var(--font-display);
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--ink);
+    letter-spacing: .05em;
   }
-  .hero .wrap{
-    display:flex;
-    flex-direction: column;
-    gap: 28px;
-    opacity: 0;
-    transform: translateY(14px);
-    animation: reveal .8s ease-out .1s forwards;
+  .tabs{
+    display: flex;
+    gap: 4px;
   }
-  @keyframes reveal{
-    to{ opacity: 1; transform: translateY(0); }
-  }
-  @media (prefers-reduced-motion: reduce){
-    .hero .wrap{ animation: none; opacity: 1; transform: none; }
-  }
-
-  .badge{
-    display:inline-flex;
-    align-items:center;
-    gap:8px;
-    width: fit-content;
-    font-size: 13px;
+  .tab{
+    position: relative;
+    padding: 10px 22px;
+    font-size: 14.5px;
     color: var(--ink-soft);
-    border: 1px solid var(--line);
-    padding: 5px 12px;
-    border-radius: 999px;
-    background: var(--bg-alt);
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    font-family: inherit;
+    letter-spacing: .02em;
+    transition: color .25s ease;
   }
-  .badge .dot{
-    width:6px; height:6px; border-radius:50%;
+  .tab::after{
+    content: "";
+    position: absolute;
+    left: 50%; bottom: 4px;
+    width: 0; height: 1px;
     background: var(--accent);
+    transition: width .35s ease, left .35s ease;
+  }
+  .tab:hover{ color: var(--ink); }
+  .tab:hover::after{ width: 60%; left: 20%; }
+  .tab.is-active{
+    color: var(--ink);
+    font-weight: 700;
+  }
+  .tab.is-active::after{
+    width: 100%; left: 0;
+    background: var(--accent);
+    height: 2px;
   }
 
-  .hero-emblem{ width: 52px; height: 52px; color: var(--accent); }
+  /* ---------- 슬라이더(Swiper) ---------- */
+  .stage{
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+  }
+  .stage .swiper{
+    width: 100%;
+    height: 100%;
+  }
+  .swiper-slide{
+    position: relative;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
 
+  /* 공통 슬라이드 배경 (그라디언트로 대체 — 나중에 이미지/영상 넣으면 됨) */
+  .slide-bg{
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    transform: scale(1.06);
+    transition: transform 1.4s ease-out;
+  }
+  .swiper-slide-active .slide-bg{ transform: scale(1); }
+
+  .slide-bg::after{
+    content: "";
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(ellipse at center, transparent 30%, rgba(0,0,0,.7) 100%),
+      linear-gradient(180deg, rgba(0,0,0,.2) 0%, rgba(0,0,0,.6) 100%);
+  }
+
+  /* 각 슬라이드 배경 톤 (플레이스홀더) */
+  .bg-main{ background: radial-gradient(ellipse at 30% 40%, #3a2f24 0%, #0f0e0c 70%); }
+  .bg-about{ background: radial-gradient(ellipse at 70% 50%, #24303a 0%, #0f0e0c 70%); }
+  .bg-char{ background: radial-gradient(ellipse at 50% 30%, #3a243a 0%, #0f0e0c 70%); }
+  .bg-world{ background: radial-gradient(ellipse at 20% 70%, #243a2a 0%, #0f0e0c 70%); }
+  .bg-play{ background: radial-gradient(ellipse at 80% 30%, #3a2424 0%, #0f0e0c 70%); }
+
+  /* ---------- 슬라이드 콘텐츠 (등장 애니메이션) ---------- */
+  .slide-content{
+    position: relative;
+    z-index: 1;
+    max-width: 900px;
+    padding: 0 40px;
+    text-align: center;
+  }
+  .slide-content > *{
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity .7s ease, transform .9s ease;
+  }
+  .swiper-slide-active .slide-content > *{
+    opacity: 1;
+    transform: translateY(0);
+  }
+  /* 요소별 지연으로 순차 등장 */
+  .swiper-slide-active .slide-content > *:nth-child(1){ transition-delay: .15s; }
+  .swiper-slide-active .slide-content > *:nth-child(2){ transition-delay: .30s; }
+  .swiper-slide-active .slide-content > *:nth-child(3){ transition-delay: .45s; }
+  .swiper-slide-active .slide-content > *:nth-child(4){ transition-delay: .60s; }
+  .swiper-slide-active .slide-content > *:nth-child(5){ transition-delay: .75s; }
+
+  .eyebrow{
+    display: inline-block;
+    font-size: 13px;
+    letter-spacing: .3em;
+    color: var(--accent);
+    padding: 4px 14px;
+    border: 1px solid var(--accent);
+    border-radius: 2px;
+  }
   h1.title{
     font-family: var(--font-display);
     font-weight: 700;
-    font-size: clamp(2.1rem, 5vw, 3.2rem);
-    line-height: 1.25;
-    margin: 0;
+    font-size: clamp(2.4rem, 6vw, 4.5rem);
+    line-height: 1.15;
+    letter-spacing: -.01em;
   }
-  .tagline{
-    font-size: clamp(1.05rem, 2vw, 1.25rem);
-    color: var(--ink-soft);
-    max-width: 46ch;
-    margin: 0;
-  }
-
-  .hero-meta{
-    display:flex;
-    gap: 20px;
-    flex-wrap: wrap;
-    font-size: 13.5px;
-    color: var(--ink-soft);
-    padding-top: 4px;
-  }
-  .hero-meta span{ white-space: nowrap; }
-
-  /* ---------- Sections ---------- */
-  section{ padding: 72px 0; }
-  section + section{ border-top: 1px solid var(--line); }
-
-  .eyebrow-line{
-    display:flex;
-    align-items:center;
-    gap: 14px;
-    margin-bottom: 28px;
-  }
-  .eyebrow-line .num{
-    font-family: var(--font-display);
-    color: var(--gold);
-    font-size: 15px;
-  }
-  .eyebrow-line h2{
+  h2.section-title{
     font-family: var(--font-display);
     font-weight: 700;
-    font-size: 1.5rem;
-    margin: 0;
+    font-size: clamp(2rem, 4.5vw, 3rem);
+    line-height: 1.2;
   }
-  .eyebrow-line::after{
-    content:"";
-    flex:1;
-    height:1px;
-    background: var(--line);
-  }
-
-  /* Concept */
-  #concept .pull{
-    font-family: var(--font-display);
-    font-size: clamp(1.2rem, 2.6vw, 1.6rem);
-    line-height: 1.55;
-    max-width: 62ch;
-    border-left: 3px solid var(--accent);
-    padding-left: 22px;
-    margin: 0 0 24px;
-  }
-  #concept p{
-    max-width: 68ch;
+  .lead{
+    font-size: clamp(1rem, 1.6vw, 1.2rem);
     color: var(--ink-soft);
+    max-width: 55ch;
+    margin: 0 auto;
   }
 
-  /* Devlog timeline */
-  .timeline{
-    position: relative;
-    margin-left: 6px;
-    padding-left: 26px;
-    border-left: 1px solid var(--line);
+  /* 캐릭터/월드 그리드 */
+  .card-grid{
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 18px;
+    text-align: left;
   }
-  .entry{ position: relative; padding-bottom: 44px; }
-  .entry:last-child{ padding-bottom: 0; }
-  .entry::before{
-    content:"";
-    position:absolute;
-    left: -31px;
-    top: 4px;
-    width: 9px; height: 9px;
-    border-radius: 50%;
-    background: var(--bg);
-    border: 2px solid var(--accent);
+  .card{
+    padding: 22px;
+    background: rgba(33, 30, 26, .6);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    backdrop-filter: blur(6px);
+    transition: transform .3s ease, border-color .3s ease;
   }
-  .entry .date{
-    display:block;
-    font-size: 13px;
-    letter-spacing: .02em;
-    color: var(--gold);
+  .card:hover{
+    transform: translateY(-4px);
+    border-color: var(--accent);
+  }
+  .card h3{
+    font-family: var(--font-display);
+    font-size: 1.2rem;
     margin-bottom: 6px;
   }
-  .entry h3{
-    font-family: var(--font-display);
-    font-size: 1.15rem;
-    margin: 0 0 8px;
+  .card .role{
+    font-size: 12px;
+    letter-spacing: .15em;
+    color: var(--accent);
+    margin-bottom: 12px;
   }
-  .entry p{
-    margin:0;
-    color: var(--ink-soft);
-    max-width: 60ch;
+  .card p{ font-size: 14px; color: var(--ink-soft); }
+
+  @media (max-width: 720px){
+    .card-grid{ grid-template-columns: 1fr; }
   }
 
-  /* Gallery */
-  .gallery-grid{
-    display:grid;
-    grid-template-columns: repeat(3, 1fr);
+  /* 페이지 인디케이터 (우측 세로 도트) */
+  .indicator{
+    position: fixed;
+    right: 30px;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 40;
+    display: flex;
+    flex-direction: column;
     gap: 14px;
   }
-  .shot-slot{
-    aspect-ratio: 4/3;
-    border: 1px dashed var(--line);
-    border-radius: 6px;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    color: var(--ink-soft);
-    font-size: 13px;
-    background: var(--bg-alt);
-    text-align:center;
-    padding: 12px;
+  .indicator .dot{
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--ink-soft);
+    opacity: .35;
+    transition: opacity .3s ease, transform .3s ease, background .3s ease;
+    cursor: pointer;
+    border: none;
+    padding: 0;
   }
-  @media (max-width: 560px){
-    .gallery-grid{ grid-template-columns: 1fr 1fr; }
-  }
-
-  /* Follow */
-  .link-row{
-    display:flex;
-    flex-wrap: wrap;
-    gap: 12px;
-  }
-  .link-row a{
-    display:inline-flex;
-    align-items:center;
-    gap:8px;
-    text-decoration:none;
-    color: var(--ink);
-    border: 1px solid var(--line);
-    padding: 10px 18px;
-    border-radius: 8px;
-    font-size: 14.5px;
-    background: var(--bg-alt);
-    transition: border-color .15s ease, transform .15s ease;
-  }
-  .link-row a:hover{
-    border-color: var(--accent);
-    transform: translateY(-1px);
+  .indicator .dot.is-active{
+    opacity: 1;
+    background: var(--accent);
+    transform: scale(1.4);
   }
 
-  footer{
-    padding: 40px 0 56px;
-    font-size: 13px;
+  /* 하단 스크롤 힌트 */
+  .scroll-hint{
+    position: fixed;
+    left: 50%;
+    bottom: 32px;
+    transform: translateX(-50%);
+    z-index: 40;
+    font-size: 11px;
+    letter-spacing: .3em;
     color: var(--ink-soft);
+    opacity: .7;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    pointer-events: none;
+  }
+  .scroll-hint .line{
+    width: 1px;
+    height: 30px;
+    background: linear-gradient(180deg, var(--ink-soft), transparent);
+    animation: hint 2s ease-in-out infinite;
+  }
+  @keyframes hint{
+    0%, 100%{ opacity: .3; transform: translateY(0); }
+    50%{ opacity: 1; transform: translateY(6px); }
   }
 
-  /* ---------- Tabs (상단 네비) ---------- */
-  .tabs{
-    border-bottom: 1px solid var(--line);
-    background: var(--bg-alt);
-  }
-  .tabs .wrap{
-    display:flex;
-    gap: 4px;
-    padding-top: 12px;
-    padding-bottom: 0;
-  }
-  .tabs a{
-    display:inline-block;
-    padding: 12px 22px;
-    font-size: 14.5px;
-    text-decoration: none;
-    color: var(--ink-soft);
-    border: 1px solid transparent;
-    border-bottom: none;
-    border-radius: 6px 6px 0 0;
-    transition: background .15s ease, color .15s ease;
-  }
-  .tabs a:hover{
-    color: var(--ink);
-    background: var(--bg);
-  }
-  .tabs a.active{
-    color: var(--ink);
-    background: var(--bg);
-    border-color: var(--line);
-    font-weight: 700;
+  /* 마지막 슬라이드에서 스크롤 힌트 숨김 */
+  body.at-last .scroll-hint{ opacity: 0; }
+
+  @media (max-width: 720px){
+    .gnb{ padding: 14px 16px; flex-direction: column; gap: 10px; }
+    .tabs{ flex-wrap: wrap; justify-content: center; }
+    .tab{ padding: 8px 12px; font-size: 13px; }
+    .indicator{ right: 14px; }
   }
 </style>
 </head>
 <body>
 
-<nav class="tabs" aria-label="주요 페이지">
-  <div class="wrap">
-    <a href="characters.html">캐릭터 소개</a>
-    <a href="world.html">세계관 소개</a>
-  </div>
-</nav>
-
-<header class="hero">
-  <div class="wrap">
-    <svg class="hero-emblem" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-      <path d="M24 4C14 10 8 18 8 26c0 9 7 16 16 16s16-7 16-16c0-8-6-16-16-22Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
-      <path d="M24 16v18M17 27l7 7 7-7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-    </svg>
-
-    <span class="badge"><span class="dot"></span>개발 중</span>
-
-    <!-- [편집 지점] 게임 이름과 한 줄 소개 -->
-    <h1 class="title">[게임 이름]</h1>
-    <p class="tagline">[게임을 한 문장으로 설명하는 카피 — 무엇을 하는 게임이고, 플레이어가 어떤 기분을 느끼길 바라는지]</p>
-
-    <div class="hero-meta">
-      <span>플랫폼: [예: 모바일 · 태블릿]</span>
-      <span>장르: [예: 퍼즐 · 캐주얼]</span>
-      <span>시작: [YYYY.MM]</span>
-    </div>
-  </div>
+<header class="gnb">
+  <a href="#" class="brand" data-goto="0">[게임 이름]</a>
+  <nav class="tabs" aria-label="주요 페이지">
+    <button class="tab is-active" data-goto="0">메인</button>
+    <button class="tab" data-goto="1">게임 개요</button>
+    <button class="tab" data-goto="2">캐릭터</button>
+    <button class="tab" data-goto="3">세계관</button>
+    <button class="tab" data-goto="4">플레이</button>
+  </nav>
 </header>
 
-<main>
-  <!-- 컨셉 설명 -->
-  <section id="concept">
-    <div class="wrap">
-      <div class="eyebrow-line">
-        <span class="num">01</span>
-        <h2>이 게임의 컨셉</h2>
-      </div>
-      <p class="pull">[게임의 핵심 아이디어를 한두 문장으로 — 어떤 경험을 주고 싶은지, 왜 이 게임을 만들고 있는지]</p>
-      <p>[좀 더 자세한 설명. 어떤 계기로 이 아이디어를 떠올렸는지, 핵심 재미 요소는 무엇인지, 비슷한 장르의 게임과 무엇이 다른지 등을 자유롭게 적어주세요.]</p>
-    </div>
-  </section>
+<main class="stage">
+  <div class="swiper">
+    <div class="swiper-wrapper">
 
-  <!-- 개발 일지 : 날짜 순서가 있는 내용이라 타임라인으로 구성했습니다 -->
-  <section id="devlog">
-    <div class="wrap">
-      <div class="eyebrow-line">
-        <span class="num">02</span>
-        <h2>개발 이야기</h2>
-      </div>
+      <!-- 0. 메인 -->
+      <section class="swiper-slide" data-section="main">
+        <div class="slide-bg bg-main"></div>
+        <div class="slide-content">
+          <span class="eyebrow">OFFICIAL SITE</span>
+          <h1 class="title">[게임 이름]</h1>
+          <p class="lead">[게임을 한 문장으로 설명하는 카피 — 어떤 세계에서, 어떤 경험을 하게 되는가]</p>
+        </div>
+      </section>
 
-      <div class="timeline">
-        <div class="entry">
-          <span class="date">[YYYY.MM]</span>
-          <h3>첫 스케치</h3>
-          <p>[아이디어가 처음 떠오른 순간, 혹은 왜 이 게임을 만들기로 했는지에 대한 이야기]</p>
+      <!-- 1. 게임 개요 -->
+      <section class="swiper-slide" data-section="about">
+        <div class="slide-bg bg-about"></div>
+        <div class="slide-content">
+          <span class="eyebrow">01 &nbsp;·&nbsp; ABOUT</span>
+          <h2 class="section-title">게임 개요</h2>
+          <p class="lead">[게임의 장르, 핵심 시스템, 어떤 방식으로 즐기는지에 대한 간단한 소개]</p>
+          <p class="lead">[플레이어가 얻게 될 경험이나 감정 — 왜 이 게임을 해야 하는지 한 문장으로]</p>
         </div>
-        <div class="entry">
-          <span class="date">[YYYY.MM]</span>
-          <h3>프로토타입</h3>
-          <p>[가장 러프한 버전을 만들어보며 확인하고 싶었던 것, 그리고 실제로 해보니 어땠는지]</p>
-        </div>
-        <div class="entry">
-          <span class="date">[YYYY.MM]</span>
-          <h3>방향을 바꾼 지점</h3>
-          <p>[피드백을 받거나 스스로 판단해서 컨셉을 조정한 이야기가 있다면]</p>
-        </div>
-        <div class="entry">
-          <span class="date">지금</span>
-          <h3>현재 진행 상황</h3>
-          <p>[지금 어디까지 만들어졌는지, 다음으로 무엇을 할 계획인지]</p>
-        </div>
-      </div>
-    </div>
-  </section>
+      </section>
 
-  <!-- 스크린샷 -->
-  <section id="gallery">
-    <div class="wrap">
-      <div class="eyebrow-line">
-        <span class="num">03</span>
-        <h2>스크린샷</h2>
-      </div>
-      <!-- [편집 지점] 각 .shot-slot 을 <img src="images/파일명.png" alt="설명"> 으로 교체하세요 -->
-      <div class="gallery-grid">
-        <div class="shot-slot">스크린샷 1</div>
-        <div class="shot-slot">스크린샷 2</div>
-        <div class="shot-slot">스크린샷 3</div>
-      </div>
-    </div>
-  </section>
+      <!-- 2. 캐릭터 -->
+      <section class="swiper-slide" data-section="character">
+        <div class="slide-bg bg-char"></div>
+        <div class="slide-content">
+          <span class="eyebrow">02 &nbsp;·&nbsp; CHARACTER</span>
+          <h2 class="section-title">캐릭터</h2>
+          <div class="card-grid">
+            <div class="card">
+              <h3>[이름]</h3>
+              <div class="role">주인공</div>
+              <p>[성격과 배경을 짧게 소개]</p>
+            </div>
+            <div class="card">
+              <h3>[이름]</h3>
+              <div class="role">동료</div>
+              <p>[성격과 배경을 짧게 소개]</p>
+            </div>
+            <div class="card">
+              <h3>[이름]</h3>
+              <div class="role">라이벌</div>
+              <p>[성격과 배경을 짧게 소개]</p>
+            </div>
+          </div>
+        </div>
+      </section>
 
-  <!-- 링크 -->
-  <section id="follow">
-    <div class="wrap">
-      <div class="eyebrow-line">
-        <span class="num">04</span>
-        <h2>더 보기</h2>
-      </div>
-      <div class="link-row">
-        <a href="#">itch.io 페이지</a>
-        <a href="#">X (트위터)</a>
-        <a href="#">디스코드</a>
-      </div>
+      <!-- 3. 세계관 -->
+      <section class="swiper-slide" data-section="world">
+        <div class="slide-bg bg-world"></div>
+        <div class="slide-content">
+          <span class="eyebrow">03 &nbsp;·&nbsp; WORLD</span>
+          <h2 class="section-title">세계관</h2>
+          <p class="lead">[세계의 핵심을 한두 문장으로 — 시대 배경, 분위기, 주된 갈등]</p>
+          <p class="lead">[플레이어가 발을 딛는 무대에 대한 조금 더 자세한 설명]</p>
+        </div>
+      </section>
+
+      <!-- 4. 플레이 -->
+      <section class="swiper-slide" data-section="play">
+        <div class="slide-bg bg-play"></div>
+        <div class="slide-content">
+          <span class="eyebrow">04 &nbsp;·&nbsp; PLAY</span>
+          <h2 class="section-title">플레이</h2>
+          <p class="lead">[플레이 방식 소개 — 전투, 탐험, 성장 시스템 등]</p>
+          <div class="card-grid">
+            <div class="card">
+              <h3>전투</h3>
+              <div class="role">COMBAT</div>
+              <p>[전투 시스템의 핵심을 한두 문장으로]</p>
+            </div>
+            <div class="card">
+              <h3>탐험</h3>
+              <div class="role">EXPLORE</div>
+              <p>[탐험/이동에서의 재미 요소]</p>
+            </div>
+            <div class="card">
+              <h3>성장</h3>
+              <div class="role">GROWTH</div>
+              <p>[성장 시스템 개요]</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
     </div>
-  </section>
+  </div>
 </main>
 
-<footer>
-  <div class="wrap">
-    &copy; [YYYY] [게임 이름]. 이 페이지는 GitHub Pages로 호스팅됩니다.
-  </div>
-</footer>
+<aside class="indicator" aria-label="섹션 인디케이터">
+  <button class="dot is-active" data-goto="0" aria-label="메인"></button>
+  <button class="dot" data-goto="1" aria-label="게임 개요"></button>
+  <button class="dot" data-goto="2" aria-label="캐릭터"></button>
+  <button class="dot" data-goto="3" aria-label="세계관"></button>
+  <button class="dot" data-goto="4" aria-label="플레이"></button>
+</aside>
+
+<div class="scroll-hint" aria-hidden="true">
+  <span>SCROLL</span>
+  <span class="line"></span>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+<script>
+  const swiper = new Swiper('.swiper', {
+    direction: 'vertical',
+    effect: 'fade',
+    fadeEffect: { crossFade: true },
+    speed: 900,
+    mousewheel: {
+      sensitivity: 1,
+      thresholdDelta: 30,
+      releaseOnEdges: true,
+    },
+    keyboard: { enabled: true },
+    on: {
+      slideChange(){
+        const i = this.activeIndex;
+        document.querySelectorAll('.tab').forEach((el, idx) => {
+          el.classList.toggle('is-active', idx === i);
+        });
+        document.querySelectorAll('.indicator .dot').forEach((el, idx) => {
+          el.classList.toggle('is-active', idx === i);
+        });
+        document.body.classList.toggle('at-last', i === this.slides.length - 1);
+      },
+    },
+  });
+
+  document.querySelectorAll('[data-goto]').forEach(el => {
+    el.addEventListener('click', (e) => {
+      e.preventDefault();
+      const i = parseInt(el.dataset.goto, 10);
+      swiper.slideTo(i);
+    });
+  });
+</script>
 
 </body>
 </html>
