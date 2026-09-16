@@ -1,0 +1,18 @@
+# Windows
+Thumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# 편집기 설정
+.vscode/
+.idea/
+*.swp
+
+# OS
+.DS_Store
+
+# 환경변수 (비밀 정보)
+.env
+.env.local
+*.pem
+*.key
