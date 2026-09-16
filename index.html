@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<!--
+  이 파일은 그대로 GitHub Pages에 올려서 바로 쓸 수 있는 템플릿입니다.
+
+  [사용법]
+  1. GitHub에 새 레포지토리를 만들고 이 파일을 index.html 이름 그대로 루트에 올립니다.
+  2. 레포 Settings → Pages → Branch를 main(또는 master)으로 설정하면
+     https://아이디.github.io/레포이름 주소로 몇 분 안에 공개됩니다.
+  3. 아래 [편집 지점] 주석이 붙은 부분들을 실제 게임 정보로 바꿔주세요.
+     - 게임 이름 / 한 줄 소개: <header class="hero"> 안
+     - 컨셉 설명 문단: #concept 섹션
+     - 개발 일지 항목들: #devlog 섹션 (실제 있었던 순서/날짜로 바꾸세요)
+     - 스크린샷: #gallery 섹션의 .shot-slot 을 <img src="..."> 로 교체
+     - 외부 링크: #follow 섹션의 href="#" 부분
+-->
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>[게임 이름] — 개발 이야기</title>
+<meta name="description" content="[게임 이름]의 컨셉과 개발 과정을 소개합니다.">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" as="style" crossorigin
+      href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.css">
+
+<style>
+  :root{
+    --bg: #F1EEE4;
+    --bg-alt: #E7E2D2;
+    --ink: #1E1C18;
+    --ink-soft: #5B564C;
+    --accent: #2F5233;
+    --accent-soft: #7C9473;
+    --gold: #A9773A;
+    --line: #D3CBB4;
+    --font-display: 'Gowun Batang', serif;
+    --font-body: 'PretendardVariable', -apple-system, BlinkMacSystemFont, 'Malgun Gothic', sans-serif;
+    --max-w: 760px;
+  }
+
+  *{ box-sizing: border-box; }
+  html{ scroll-behavior: smooth; }
+  body{
+    margin:0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--font-body);
+    line-height: 1.7;
+    -webkit-font-smoothing: antialiased;
+  }
+  ::selection{ background: var(--accent-soft); color: #fff; }
+
+  a{ color: var(--accent); }
+  a:focus-visible, button:focus-visible{
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
+  }
+
+  .wrap{
+    max-width: var(--max-w);
+    margin: 0 auto;
+    padding: 0 24px;
+  }
+
+  /* ---------- Hero ---------- */
+  .hero{
+    padding: 96px 0 72px;
+    border-bottom: 1px solid var(--line);
+  }
+  .hero .wrap{
+    display:flex;
+    flex-direction: column;
+    gap: 28px;
+    opacity: 0;
+    transform: translateY(14px);
+    animation: reveal .8s ease-out .1s forwards;
+  }
+  @keyframes reveal{
+    to{ opacity: 1; transform: translateY(0); }
+  }
+  @media (prefers-reduced-motion: reduce){
+    .hero .wrap{ animation: none; opacity: 1; transform: none; }
+  }
+
+  .badge{
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    width: fit-content;
+    font-size: 13px;
+    color: var(--ink-soft);
+    border: 1px solid var(--line);
+    padding: 5px 12px;
+    border-radius: 999px;
+    background: var(--bg-alt);
+  }
+  .badge .dot{
+    width:6px; height:6px; border-radius:50%;
+    background: var(--accent);
+  }
+
+  .hero-emblem{ width: 52px; height: 52px; color: var(--accent); }
+
+  h1.title{
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: clamp(2.1rem, 5vw, 3.2rem);
+    line-height: 1.25;
+    margin: 0;
+  }
+  .tagline{
+    font-size: clamp(1.05rem, 2vw, 1.25rem);
+    color: var(--ink-soft);
+    max-width: 46ch;
+    margin: 0;
+  }
+
+  .hero-meta{
+    display:flex;
+    gap: 20px;
+    flex-wrap: wrap;
+    font-size: 13.5px;
+    color: var(--ink-soft);
+    padding-top: 4px;
+  }
+  .hero-meta span{ white-space: nowrap; }
+
+  /* ---------- Sections ---------- */
+  section{ padding: 72px 0; }
+  section + section{ border-top: 1px solid var(--line); }
+
+  .eyebrow-line{
+    display:flex;
+    align-items:center;
+    gap: 14px;
+    margin-bottom: 28px;
+  }
+  .eyebrow-line .num{
+    font-family: var(--font-display);
+    color: var(--gold);
+    font-size: 15px;
+  }
+  .eyebrow-line h2{
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 1.5rem;
+    margin: 0;
+  }
+  .eyebrow-line::after{
+    content:"";
+    flex:1;
+    height:1px;
+    background: var(--line);
+  }
+
+  /* Concept */
+  #concept .pull{
+    font-family: var(--font-display);
+    font-size: clamp(1.2rem, 2.6vw, 1.6rem);
+    line-height: 1.55;
+    max-width: 62ch;
+    border-left: 3px solid var(--accent);
+    padding-left: 22px;
+    margin: 0 0 24px;
+  }
+  #concept p{
+    max-width: 68ch;
+    color: var(--ink-soft);
+  }
+
+  /* Devlog timeline */
+  .timeline{
+    position: relative;
+    margin-left: 6px;
+    padding-left: 26px;
+    border-left: 1px solid var(--line);
+  }
+  .entry{ position: relative; padding-bottom: 44px; }
+  .entry:last-child{ padding-bottom: 0; }
+  .entry::before{
+    content:"";
+    position:absolute;
+    left: -31px;
+    top: 4px;
+    width: 9px; height: 9px;
+    border-radius: 50%;
+    background: var(--bg);
+    border: 2px solid var(--accent);
+  }
+  .entry .date{
+    display:block;
+    font-size: 13px;
+    letter-spacing: .02em;
+    color: var(--gold);
+    margin-bottom: 6px;
+  }
+  .entry h3{
+    font-family: var(--font-display);
+    font-size: 1.15rem;
+    margin: 0 0 8px;
+  }
+  .entry p{
+    margin:0;
+    color: var(--ink-soft);
+    max-width: 60ch;
+  }
+
+  /* Gallery */
+  .gallery-grid{
+    display:grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+  }
+  .shot-slot{
+    aspect-ratio: 4/3;
+    border: 1px dashed var(--line);
+    border-radius: 6px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    color: var(--ink-soft);
+    font-size: 13px;
+    background: var(--bg-alt);
+    text-align:center;
+    padding: 12px;
+  }
+  @media (max-width: 560px){
+    .gallery-grid{ grid-template-columns: 1fr 1fr; }
+  }
+
+  /* Follow */
+  .link-row{
+    display:flex;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  .link-row a{
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    text-decoration:none;
+    color: var(--ink);
+    border: 1px solid var(--line);
+    padding: 10px 18px;
+    border-radius: 8px;
+    font-size: 14.5px;
+    background: var(--bg-alt);
+    transition: border-color .15s ease, transform .15s ease;
+  }
+  .link-row a:hover{
+    border-color: var(--accent);
+    transform: translateY(-1px);
+  }
+
+  footer{
+    padding: 40px 0 56px;
+    font-size: 13px;
+    color: var(--ink-soft);
+  }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="wrap">
+    <svg class="hero-emblem" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <path d="M24 4C14 10 8 18 8 26c0 9 7 16 16 16s16-7 16-16c0-8-6-16-16-22Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+      <path d="M24 16v18M17 27l7 7 7-7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+
+    <span class="badge"><span class="dot"></span>개발 중</span>
+
+    <!-- [편집 지점] 게임 이름과 한 줄 소개 -->
+    <h1 class="title">[게임 이름]</h1>
+    <p class="tagline">[게임을 한 문장으로 설명하는 카피 — 무엇을 하는 게임이고, 플레이어가 어떤 기분을 느끼길 바라는지]</p>
+
+    <div class="hero-meta">
+      <span>플랫폼: [예: 모바일 · 태블릿]</span>
+      <span>장르: [예: 퍼즐 · 캐주얼]</span>
+      <span>시작: [YYYY.MM]</span>
+    </div>
+  </div>
+</header>
+
+<main>
+  <!-- 컨셉 설명 -->
+  <section id="concept">
+    <div class="wrap">
+      <div class="eyebrow-line">
+        <span class="num">01</span>
+        <h2>이 게임의 컨셉</h2>
+      </div>
+      <p class="pull">[게임의 핵심 아이디어를 한두 문장으로 — 어떤 경험을 주고 싶은지, 왜 이 게임을 만들고 있는지]</p>
+      <p>[좀 더 자세한 설명. 어떤 계기로 이 아이디어를 떠올렸는지, 핵심 재미 요소는 무엇인지, 비슷한 장르의 게임과 무엇이 다른지 등을 자유롭게 적어주세요.]</p>
+    </div>
+  </section>
+
+  <!-- 개발 일지 : 날짜 순서가 있는 내용이라 타임라인으로 구성했습니다 -->
+  <section id="devlog">
+    <div class="wrap">
+      <div class="eyebrow-line">
+        <span class="num">02</span>
+        <h2>개발 이야기</h2>
+      </div>
+
+      <div class="timeline">
+        <div class="entry">
+          <span class="date">[YYYY.MM]</span>
+          <h3>첫 스케치</h3>
+          <p>[아이디어가 처음 떠오른 순간, 혹은 왜 이 게임을 만들기로 했는지에 대한 이야기]</p>
+        </div>
+        <div class="entry">
+          <span class="date">[YYYY.MM]</span>
+          <h3>프로토타입</h3>
+          <p>[가장 러프한 버전을 만들어보며 확인하고 싶었던 것, 그리고 실제로 해보니 어땠는지]</p>
+        </div>
+        <div class="entry">
+          <span class="date">[YYYY.MM]</span>
+          <h3>방향을 바꾼 지점</h3>
+          <p>[피드백을 받거나 스스로 판단해서 컨셉을 조정한 이야기가 있다면]</p>
+        </div>
+        <div class="entry">
+          <span class="date">지금</span>
+          <h3>현재 진행 상황</h3>
+          <p>[지금 어디까지 만들어졌는지, 다음으로 무엇을 할 계획인지]</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 스크린샷 -->
+  <section id="gallery">
+    <div class="wrap">
+      <div class="eyebrow-line">
+        <span class="num">03</span>
+        <h2>스크린샷</h2>
+      </div>
+      <!-- [편집 지점] 각 .shot-slot 을 <img src="images/파일명.png" alt="설명"> 으로 교체하세요 -->
+      <div class="gallery-grid">
+        <div class="shot-slot">스크린샷 1</div>
+        <div class="shot-slot">스크린샷 2</div>
+        <div class="shot-slot">스크린샷 3</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 링크 -->
+  <section id="follow">
+    <div class="wrap">
+      <div class="eyebrow-line">
+        <span class="num">04</span>
+        <h2>더 보기</h2>
+      </div>
+      <div class="link-row">
+        <a href="#">itch.io 페이지</a>
+        <a href="#">X (트위터)</a>
+        <a href="#">디스코드</a>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    &copy; [YYYY] [게임 이름]. 이 페이지는 GitHub Pages로 호스팅됩니다.
+  </div>
+</footer>
+
+</body>
+</html>
