@@ -260,9 +260,49 @@
     font-size: 13px;
     color: var(--ink-soft);
   }
+
+  /* ---------- Tabs (상단 네비) ---------- */
+  .tabs{
+    border-bottom: 1px solid var(--line);
+    background: var(--bg-alt);
+  }
+  .tabs .wrap{
+    display:flex;
+    gap: 4px;
+    padding-top: 12px;
+    padding-bottom: 0;
+  }
+  .tabs a{
+    display:inline-block;
+    padding: 12px 22px;
+    font-size: 14.5px;
+    text-decoration: none;
+    color: var(--ink-soft);
+    border: 1px solid transparent;
+    border-bottom: none;
+    border-radius: 6px 6px 0 0;
+    transition: background .15s ease, color .15s ease;
+  }
+  .tabs a:hover{
+    color: var(--ink);
+    background: var(--bg);
+  }
+  .tabs a.active{
+    color: var(--ink);
+    background: var(--bg);
+    border-color: var(--line);
+    font-weight: 700;
+  }
 </style>
 </head>
 <body>
+
+<nav class="tabs" aria-label="주요 페이지">
+  <div class="wrap">
+    <a href="characters.html">캐릭터 소개</a>
+    <a href="world.html">세계관 소개</a>
+  </div>
+</nav>
 
 <header class="hero">
   <div class="wrap">
