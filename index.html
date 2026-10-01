@@ -51,16 +51,16 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    background: linear-gradient(180deg, rgba(15,14,12,.85) 0%, rgba(15,14,12,0) 100%);
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
+    padding-bottom: 40px;
+    background: linear-gradient(180deg, rgba(0,0,0,.9) 0%, rgba(0,0,0,.55) 50%, rgba(0,0,0,0) 100%);
   }
   .brand{
-    font-family: var(--font-display);
-    font-size: 22px;
-    font-weight: 700;
-    color: var(--ink);
-    letter-spacing: .05em;
+    display: block;
+    line-height: 0;
+  }
+  .brand img{
+    height: 44px;
+    width: auto;
   }
   .tabs{
     display: flex;
@@ -139,7 +139,7 @@
   }
 
   /* 각 슬라이드 배경 톤 (플레이스홀더) */
-  .bg-main{ background: radial-gradient(ellipse at 30% 40%, #3a2f24 0%, #0f0e0c 70%); }
+  .bg-main{ background: #0f0e0c url('Illust_main.jpg') center / cover no-repeat; }
   .bg-about{ background: radial-gradient(ellipse at 70% 50%, #24303a 0%, #0f0e0c 70%); }
   .bg-char{ background: radial-gradient(ellipse at 50% 30%, #3a243a 0%, #0f0e0c 70%); }
   .bg-world{ background: radial-gradient(ellipse at 20% 70%, #243a2a 0%, #0f0e0c 70%); }
@@ -184,6 +184,13 @@
     font-size: clamp(2.4rem, 6vw, 4.5rem);
     line-height: 1.15;
     letter-spacing: -.01em;
+  }
+  .title-logo{
+    display: block;
+    width: min(720px, 80vw);
+    height: auto;
+    margin: 0 auto;
+    filter: drop-shadow(0 4px 18px rgba(0,0,0,.65));
   }
   h2.section-title{
     font-family: var(--font-display);
@@ -293,7 +300,8 @@
   body.at-last .scroll-hint{ opacity: 0; }
 
   @media (max-width: 720px){
-    .gnb{ padding: 14px 16px; flex-direction: column; gap: 10px; }
+    .gnb{ padding: 14px 16px 30px; flex-direction: column; gap: 10px; }
+    .brand img{ height: 36px; }
     .tabs{ flex-wrap: wrap; justify-content: center; }
     .tab{ padding: 8px 12px; font-size: 13px; }
     .indicator{ right: 14px; }
@@ -303,7 +311,7 @@
 <body>
 
 <header class="gnb">
-  <a href="#" class="brand" data-goto="0">[게임 이름]</a>
+  <a href="#" class="brand" data-goto="0"><img src="Logo2.png" alt="Project Terra Re:Boot"></a>
   <nav class="tabs" aria-label="주요 페이지">
     <button class="tab is-active" data-goto="0">메인</button>
     <button class="tab" data-goto="1">게임 개요</button>
@@ -322,8 +330,7 @@
         <div class="slide-bg bg-main"></div>
         <div class="slide-content">
           <span class="eyebrow">OFFICIAL SITE</span>
-          <h1 class="title">[게임 이름]</h1>
-          <p class="lead">[게임을 한 문장으로 설명하는 카피 — 어떤 세계에서, 어떤 경험을 하게 되는가]</p>
+          <h1 class="title"><img class="title-logo" src="Logo1.png" alt="Project Terra Re:Boot"></h1>
         </div>
       </section>
 
