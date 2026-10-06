@@ -10,8 +10,8 @@
  */
 
 window.FACTIONS = {
-  '배리어 코어': { color: '#C79B4A' },
-  '이레이안':    { color: '#8FAED6' },
+  '배리어 코어': { color: '#2998FF' },
+  '이레이안':    { color: '#C79B4A' },
 };
 
 window.CHARACTERS = [
