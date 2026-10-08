@@ -198,6 +198,9 @@
     margin: 0 auto;
     filter: drop-shadow(0 4px 18px rgba(0,0,0,.65));
   }
+  /* 메인: 로고가 일러스트 속 얼굴을 가리지 않도록 화면 아래쪽에 배치 */
+  [data-section="main"]{ align-items: flex-end; }
+  [data-section="main"] .slide-content{ padding-bottom: 14vh; }
   h2.section-title{
     font-family: var(--font-display);
     font-weight: 700;
