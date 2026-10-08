@@ -140,7 +140,13 @@
 
   /* 각 슬라이드 배경 톤 (플레이스홀더) */
   .bg-main{ background: #0f0e0c url('Illust_main.jpg') center / cover no-repeat; }
-  .bg-about{ background: radial-gradient(ellipse at 70% 50%, #24303a 0%, #0f0e0c 70%); }
+  .bg-about{ background: #0f0e0c url('Illust_about.jpg') center / cover no-repeat; }
+  /* 게임 개요는 글이 가운데에 길게 들어가므로 전체를 한 번 더 어둡게 */
+  .bg-about::after{
+    background:
+      radial-gradient(ellipse at center, transparent 40%, rgba(15,14,12,.6) 100%),
+      linear-gradient(180deg, rgba(15,14,12,.15) 0%, rgba(15,14,12,.6) 35%, rgba(15,14,12,.6) 75%, rgba(15,14,12,.75) 100%);
+  }
   .bg-char{ background: radial-gradient(ellipse at 50% 30%, #3a243a 0%, #0f0e0c 70%); }
   .bg-world{ background: radial-gradient(ellipse at 20% 70%, #243a2a 0%, #0f0e0c 70%); }
   .bg-play{ background: radial-gradient(ellipse at 80% 30%, #3a2424 0%, #0f0e0c 70%); }
@@ -255,8 +261,14 @@
   }
   .char-slide{
     --faction: var(--accent);
+    --faction-bg: none; /* 진영 배경 이미지 (characters.js 의 FACTIONS.bg) */
     display: block;
-    background: radial-gradient(ellipse at 68% 55%, color-mix(in srgb, var(--faction) 22%, transparent) 0%, transparent 60%);
+    background:
+      linear-gradient(90deg, rgba(15,14,12,.9) 0%, rgba(15,14,12,.6) 45%, rgba(15,14,12,.45) 100%),
+      linear-gradient(0deg, rgba(15,14,12,.8) 0%, rgba(15,14,12,0) 30%),
+      radial-gradient(ellipse at 68% 55%, color-mix(in srgb, var(--faction) 22%, transparent) 0%, transparent 60%),
+      var(--faction-bg) center / cover no-repeat,
+      var(--bg);
   }
   .char-bgname{
     position: absolute;
@@ -867,6 +879,7 @@
       const slide = tpl.content.firstElementChild.cloneNode(true);
       const faction = (window.FACTIONS || {})[c.faction];
       if (faction) slide.style.setProperty('--faction', faction.color);
+      if (faction && faction.bg) slide.style.setProperty('--faction-bg', `url('${faction.bg}')`);
 
       slide.querySelectorAll('[data-field]').forEach(el => {
         el.textContent = c[el.dataset.field] || '';

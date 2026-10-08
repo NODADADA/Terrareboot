@@ -6,12 +6,12 @@
  * - codename: 없으면 '' 로 두면 표시되지 않습니다.
  * - quote   : 따옴표 없이 대사만 적습니다. (따옴표는 화면에서 자동으로 붙음)
  * - desc    : 문단 하나당 문자열 하나.
- * - faction : 아래 FACTIONS 에 있는 이름이어야 색이 적용됩니다.
+ * - faction : 아래 FACTIONS 에 있는 이름이어야 색·배경이 적용됩니다. (bg: 진영 배경 이미지)
  */
 
 window.FACTIONS = {
-  '배리어 코어': { color: '#2998FF' },
-  '이레이안':    { color: '#C79B4A' },
+  '배리어 코어': { color: '#2998FF', bg: 'Character/img/BG_barriercore.jpg' },
+  '이레이안':    { color: '#C79B4A', bg: 'Character/img/BG_iraian.jpg' },
 };
 
 window.CHARACTERS = [
