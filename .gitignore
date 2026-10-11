@@ -16,3 +16,6 @@ $RECYCLE.BIN/
 .env.local
 *.pem
 *.key
+
+# Claude Code 일일 작업 로그
+.claude/daily-logs/

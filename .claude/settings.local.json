@@ -11,5 +11,20 @@
       "Bash(git commit *)",
       "Bash(git remote *)"
     ]
+  },
+  "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "startup",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "powershell -NoProfile -ExecutionPolicy Bypass -File \"$CLAUDE_PROJECT_DIR/.claude/hooks/daily-recap.ps1\"",
+            "timeout": 180,
+            "statusMessage": "지난 작업 요약 중..."
+          }
+        ]
+      }
+    ]
   }
 }
