@@ -140,6 +140,10 @@
 
   /* 각 슬라이드 배경 톤 (플레이스홀더) */
   .bg-main{ background: #0f0e0c url('Illust_main.jpg') center / cover no-repeat; }
+  /* 세로 화면(폰·세로 태블릿): 세로 구도 일러스트로 교체, 두 주인공이 맞부딪치는 지점을 가운데로 */
+  @media (max-aspect-ratio: 1/1){
+    .bg-main{ background-image: url('Illust_mobile.jpg'); background-position: 60% center; }
+  }
   .bg-about{ background: #0f0e0c url('Illust_about.jpg') center / cover no-repeat; }
   /* 게임 개요는 글이 가운데에 길게 들어가므로 전체를 한 번 더 어둡게 */
   .bg-about::after{
@@ -201,6 +205,12 @@
   /* 메인: 로고가 일러스트 속 얼굴을 가리지 않도록 화면 아래쪽에 배치 */
   [data-section="main"]{ align-items: flex-end; }
   [data-section="main"] .slide-content{ padding-bottom: 14vh; }
+  /* 가로 폰처럼 높이가 낮은 화면: 로고가 얼굴과 SCROLL 표시를 덮지 않도록 축소 */
+  @media (max-height: 500px){
+    [data-section="main"] .title-logo{ width: min(340px, 40vw); }
+    [data-section="main"] .slide-content{ padding-bottom: 92px; }
+    .bg-main{ background-position: center 85%; }
+  }
   h2.section-title{
     font-family: var(--font-display);
     font-weight: 700;
