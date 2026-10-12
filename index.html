@@ -765,6 +765,11 @@
     .brand img.brand-kr{ height: auto; width: calc(36px * 215 / 80 * .68); }
     .tabs{ flex-wrap: wrap; justify-content: center; }
     .tab{ padding: 8px 12px; font-size: 13px; }
+    /* 폰: 메인 로고를 화면 폭 가득(로고 캔버스 좌우 여백만 남김) — 상단 로고와 크기 차이를 분명하게 */
+    [data-section="main"] .slide-content{ padding-left: 0; padding-right: 0; }
+    [data-section="main"] .title-logo{ width: 100vw; }
+    /* 한글 로고 1.6배 — 글자 윗변(캔버스 세로 73%)을 기준으로 아래로만 키워 영문과의 간격은 PC와 같은 비율 유지 */
+    [data-section="main"] .title-logo-kr{ transform: scale(1.6); transform-origin: 50% 73%; }
     /* 폰: 좌우 스와이프와 하단 카드·목차로 넘길 수 있으므로 좌우 버튼은 숨김 */
     .side-arrow{ display: none; }
   }
