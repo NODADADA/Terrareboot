@@ -728,6 +728,17 @@
   .side-next{ right: 12px; }
   .side-next:hover{ transform: translateX(3px); }
 
+  /* 테라 더스트 파티클 — 화면 전체에 겹치는 캔버스 (클릭은 통과) */
+  .dust{
+    position: fixed;
+    inset: 0;
+    z-index: 30; /* 슬라이드 위, 스크롤 힌트(40)·상단 메뉴(50) 아래 */
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    mix-blend-mode: screen;
+  }
+
   /* 하단 스크롤 힌트 */
   .scroll-hint{
     position: fixed;
@@ -875,6 +886,8 @@
     </div>
   </div>
 </main>
+
+<canvas class="dust" id="dust" aria-hidden="true"></canvas>
 
 <div class="scroll-hint" aria-hidden="true">
   <span>SCROLL</span>
@@ -1144,6 +1157,96 @@
       swiper.slideTo(i);
     });
   });
+
+  // ---------- 테라 더스트 파티클 ----------
+  // 더스트 입자가 드문드문 천천히 떠오름
+  // 메인: 화면 왼쪽 절반은 배리어 코어 색, 오른쪽 절반은 이레이안 색 / 캐릭터: 선택한 캐릭터의 진영 색
+  // 메뉴에 들어가는 순간 이미 화면에 퍼져 있도록 미리 채워 둠
+  (function dust(){
+    if (matchMedia('(prefers-reduced-motion: reduce)').matches) return; // '동작 줄이기' 사용자는 끔
+    const canvas = document.getElementById('dust');
+    const ctx = canvas.getContext('2d');
+    const DUST = '#e9e2cf';
+    let W, H, mobile, motes = [], lastSection = null;
+    const sprites = {};
+
+    // 부드러운 빛 점 이미지 (색마다 한 번만 만들어 재사용)
+    function sprite(color){
+      if (sprites[color]) return sprites[color];
+      const s = document.createElement('canvas');
+      s.width = s.height = 32;
+      const g = s.getContext('2d');
+      const grad = g.createRadialGradient(16, 16, 0, 16, 16, 16);
+      grad.addColorStop(0, '#fff');
+      grad.addColorStop(.25, color);
+      grad.addColorStop(1, 'transparent');
+      g.fillStyle = grad;
+      g.fillRect(0, 0, 32, 32);
+      return (sprites[color] = s);
+    }
+    function resize(){
+      const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
+      W = innerWidth; H = innerHeight; mobile = W <= 720;
+      canvas.width = W * dpr; canvas.height = H * dpr;
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    }
+    const section = () => document.body.dataset.section || 'main';
+    const cap = () => (mobile ? 18 : 40); // 동시에 떠 있는 최대 개수
+    // 메인 화면 좌우 진영 색 (characters.js 의 FACTIONS 색)
+    const FACTION = window.FACTIONS || {};
+    const SIDE = {
+      left:  (FACTION['배리어 코어'] || {}).color || '#2998FF',
+      right: (FACTION['이레이안'] || {}).color || '#C79B4A',
+    };
+    function dustColor(){
+      if (section() === 'character' && window.charSwiper) {
+        const c = window.CHARACTERS[charSwiper.activeIndex];
+        const f = c && window.FACTIONS[c.faction];
+        if (f) return f.color;
+      }
+      return DUST;
+    }
+    // prefill: 처음부터 보이도록 수명의 중간쯤에서 시작
+    function spawnMote(prefill){
+      const max = 300 + Math.random() * 400;
+      const x = Math.random() * W;
+      motes.push({
+        x, y: Math.random() * H,
+        side: x < W / 2 ? 'left' : 'right', // 메인: 생겨난 쪽으로 색이 정해짐 (가운데를 넘어가도 유지)
+        vx: (Math.random() - .5) * .2, vy: -(.15 + Math.random() * .4),
+        life: prefill ? max * (.2 + Math.random() * .4) : 0, max,
+        r: .6 + Math.random() * 1.4, sway: Math.random() * 6.28,
+      });
+    }
+    function tick(){
+      if (!document.hidden) { // 다른 탭으로 나가 있으면 멈춤
+        const now = section(), main = now === 'main';
+        if (now !== lastSection) { // 메뉴가 바뀌면 그 메뉴에 맞게 바로 채움
+          motes = [];
+          while (motes.length < cap()) spawnMote(true);
+          lastSection = now;
+        }
+        if (motes.length < cap() && Math.random() < .3) spawnMote(false);
+
+        ctx.clearRect(0, 0, W, H);
+        motes = motes.filter(p => p.life++ < p.max && p.y > -20);
+        const img = sprite(dustColor()); // 캐릭터를 바꾸면 떠 있는 입자 색도 바로 바뀜
+        for (const p of motes) {
+          p.x += p.vx + Math.sin(p.life / 60 + p.sway) * .15; // 좌우로 살랑
+          p.y += p.vy;
+          const t = p.life / p.max;
+          ctx.globalAlpha = Math.min(1, t * 10) * (1 - t) * .7; // 새로 생긴 입자만 짧게 나타남, 끝에서 사라짐
+          const d = p.r * 6;
+          ctx.drawImage(main ? sprite(SIDE[p.side]) : img, p.x - d / 2, p.y - d / 2, d, d);
+        }
+        ctx.globalAlpha = 1;
+      }
+      requestAnimationFrame(tick);
+    }
+    resize();
+    addEventListener('resize', resize);
+    requestAnimationFrame(tick);
+  })();
 </script>
 
 </body>
