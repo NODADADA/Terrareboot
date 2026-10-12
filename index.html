@@ -62,6 +62,9 @@
     height: 44px;
     width: auto;
   }
+  /* 상단 로고 아래 한글 로고: 영문 로고(215x80) 폭의 68% — TERRA 줄(약 71%)보다 좁게 */
+  .brand{ display: flex; flex-direction: column; align-items: center; gap: 4px; }
+  .brand img.brand-kr{ height: auto; width: calc(44px * 215 / 80 * .68); }
   .tabs{
     display: flex;
     gap: 4px;
@@ -194,6 +197,7 @@
     font-size: clamp(2.4rem, 6vw, 4.5rem);
     line-height: 1.15;
     letter-spacing: -.01em;
+    position: relative;
   }
   .title-logo{
     display: block;
@@ -202,12 +206,16 @@
     margin: 0 auto;
     filter: drop-shadow(0 4px 18px rgba(0,0,0,.65));
   }
+  /* 한글 로고는 영문 로고와 같은 크기 캔버스라 그대로 겹치면 영문 아래에 놓임 */
+  .title-logo-kr{ position: absolute; top: 0; left: 0; right: 0; }
   /* 메인: 로고가 일러스트 속 얼굴을 가리지 않도록 화면 아래쪽에 배치 */
   [data-section="main"]{ align-items: flex-end; }
   [data-section="main"] .slide-content{ padding-bottom: 14vh; }
   /* 가로 폰처럼 높이가 낮은 화면: 로고가 얼굴과 SCROLL 표시를 덮지 않도록 축소 */
   @media (max-height: 500px){
     [data-section="main"] .title-logo{ width: min(340px, 40vw); }
+    /* 이 크기에선 한글이 너무 작아 읽히지 않으므로 숨기고 상단 로고의 한글로 대신함 */
+    [data-section="main"] .title-logo-kr{ display: none; }
     [data-section="main"] .slide-content{ padding-bottom: 92px; }
     .bg-main{ background-position: center 85%; }
   }
@@ -724,6 +732,7 @@
   @media (max-width: 720px){
     .gnb{ padding: 14px 16px 30px; flex-direction: column; gap: 10px; }
     .brand img{ height: 36px; }
+    .brand img.brand-kr{ height: auto; width: calc(36px * 215 / 80 * .68); }
     .tabs{ flex-wrap: wrap; justify-content: center; }
     .tab{ padding: 8px 12px; font-size: 13px; }
     .indicator{ right: 14px; }
@@ -733,7 +742,7 @@
 <body>
 
 <header class="gnb">
-  <a href="#" class="brand" data-goto="0"><img src="Logo2.png" alt="Project Terra Re:Boot"></a>
+  <a href="#" class="brand" data-goto="0"><img src="Logo2.png" alt="Project Terra Re:Boot"><img class="brand-kr" src="LogoKR_s.png" alt="프로젝트: 테라 리부트"></a>
   <nav class="tabs" aria-label="주요 페이지">
     <button class="tab is-active" data-goto="0">메인</button>
     <button class="tab" data-goto="1">게임 개요</button>
@@ -751,7 +760,7 @@
       <section class="swiper-slide" data-section="main">
         <div class="slide-bg bg-main"></div>
         <div class="slide-content">
-          <h1 class="title"><img class="title-logo" src="Logo1.png" alt="Project Terra Re:Boot"></h1>
+          <h1 class="title"><img class="title-logo" src="Logo1.png" alt="Project Terra Re:Boot"><img class="title-logo title-logo-kr" src="LogoKR.png" alt="프로젝트: 테라 리부트"></h1>
         </div>
       </section>
 
