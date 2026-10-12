@@ -704,32 +704,29 @@
     body[data-section="about"] .scroll-hint{ opacity: 0; }
   }
 
-  /* 페이지 인디케이터 (우측 세로 도트) */
-  .indicator{
-    position: fixed;
-    right: 30px;
+  /* 캐릭터·세계관 좌우 이동 버튼 (< >) */
+  .side-arrow{
+    position: absolute;
     top: 50%;
-    transform: translateY(-50%);
-    z-index: 40;
-    display: flex;
-    flex-direction: column;
-    gap: 14px;
-  }
-  .indicator .dot{
-    width: 8px; height: 8px;
-    border-radius: 50%;
-    background: var(--ink-soft);
-    opacity: .35;
-    transition: opacity .3s ease, transform .3s ease, background .3s ease;
-    cursor: pointer;
-    border: none;
+    z-index: 4;
+    width: 48px; height: 72px;
+    margin-top: -36px;
+    display: grid;
+    place-items: center;
     padding: 0;
+    border: 0;
+    background: none;
+    color: var(--ink);
+    opacity: .55;
+    cursor: pointer;
+    transition: opacity .25s ease, color .25s ease, transform .25s ease;
   }
-  .indicator .dot.is-active{
-    opacity: 1;
-    background: var(--accent);
-    transform: scale(1.4);
-  }
+  .side-arrow svg{ width: 22px; height: 44px; filter: drop-shadow(0 1px 6px rgba(0,0,0,.7)); }
+  .side-arrow:hover{ opacity: 1; color: var(--accent); }
+  .side-prev{ left: 12px; }
+  .side-prev:hover{ transform: translateX(-3px); }
+  .side-next{ right: 12px; }
+  .side-next:hover{ transform: translateX(3px); }
 
   /* 하단 스크롤 힌트 */
   .scroll-hint{
@@ -768,7 +765,8 @@
     .brand img.brand-kr{ height: auto; width: calc(36px * 215 / 80 * .68); }
     .tabs{ flex-wrap: wrap; justify-content: center; }
     .tab{ padding: 8px 12px; font-size: 13px; }
-    .indicator{ right: 14px; }
+    /* 폰: 좌우 스와이프와 하단 카드·목차로 넘길 수 있으므로 좌우 버튼은 숨김 */
+    .side-arrow{ display: none; }
   }
 </style>
 </head>
@@ -823,6 +821,8 @@
           <div class="swiper-wrapper" id="char-list"></div>
         </div>
         <!-- 캐릭터 선택 로스터 (카드는 characters.js 데이터로 자동 생성) -->
+        <button class="side-arrow side-prev char-prev" aria-label="이전 캐릭터"><svg viewBox="0 0 22 44" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 2 2 22l18 20"/></svg></button>
+        <button class="side-arrow side-next char-next" aria-label="다음 캐릭터"><svg viewBox="0 0 22 44" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 2l18 20L2 42"/></svg></button>
         <div class="char-pick">
           <div class="char-count"></div>
           <nav class="char-roster" id="char-roster" aria-label="캐릭터 선택"></nav>
@@ -837,6 +837,8 @@
           <div class="swiper-wrapper" id="world-list"></div>
         </div>
         <nav class="world-index" id="world-index" aria-label="세계관 목차"></nav>
+        <button class="side-arrow side-prev world-prev" aria-label="이전 항목"><svg viewBox="0 0 22 44" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 2 2 22l18 20"/></svg></button>
+        <button class="side-arrow side-next world-next" aria-label="다음 항목"><svg viewBox="0 0 22 44" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 2l18 20L2 42"/></svg></button>
       </section>
 
       <!-- 4. 플레이 -->
@@ -868,14 +870,6 @@
     </div>
   </div>
 </main>
-
-<aside class="indicator" aria-label="섹션 인디케이터">
-  <button class="dot is-active" data-goto="0" aria-label="메인"></button>
-  <button class="dot" data-goto="1" aria-label="게임 개요"></button>
-  <button class="dot" data-goto="2" aria-label="캐릭터"></button>
-  <button class="dot" data-goto="3" aria-label="세계관"></button>
-  <button class="dot" data-goto="4" aria-label="플레이"></button>
-</aside>
 
 <div class="scroll-hint" aria-hidden="true">
   <span>SCROLL</span>
@@ -952,6 +946,7 @@
       speed: 600,
       rewind: true,
       keyboard: { enabled: false },
+      navigation: { prevEl: '.char-prev', nextEl: '.char-next' },
       pagination: {
         el: '.char-count',
         type: 'fraction',
@@ -1051,6 +1046,7 @@
       speed: 700,
       rewind: true,
       keyboard: { enabled: false },
+      navigation: { prevEl: '.world-prev', nextEl: '.world-next' },
       on: {
         slideChange(){
           index.querySelectorAll('.world-tab').forEach((el, idx) => {
@@ -1094,6 +1090,7 @@
   fitText();
   if (document.fonts) document.fonts.ready.then(fitText);
 
+  let resetTimer;
   const swiper = new Swiper('.stage > .swiper', {
     direction: 'vertical',
     effect: 'fade',
@@ -1111,9 +1108,6 @@
         document.querySelectorAll('.tab').forEach((el, idx) => {
           el.classList.toggle('is-active', idx === i);
         });
-        document.querySelectorAll('.indicator .dot').forEach((el, idx) => {
-          el.classList.toggle('is-active', idx === i);
-        });
         document.body.classList.toggle('at-last', i === this.slides.length - 1);
 
         // 캐릭터/세계관 섹션에서만 좌우 방향키로 내부 슬라이드 넘기기
@@ -1124,6 +1118,16 @@
           if (key === section) s.keyboard.enable();
           else s.keyboard.disable();
         });
+
+        // 다른 메뉴로 넘어가면, 전환 애니메이션이 끝난 뒤 캐릭터·세계관을 첫 항목으로 되돌림
+        // → 다시 들어오면 항상 '카일', 세계관 첫 이야기부터 보임
+        clearTimeout(resetTimer);
+        resetTimer = setTimeout(() => {
+          const now = document.body.dataset.section;
+          Object.entries(inner).forEach(([key, s]) => {
+            if (key !== now && s.activeIndex !== 0) s.slideTo(0, 0);
+          });
+        }, this.params.speed);
       },
     },
   });
