@@ -8,13 +8,26 @@
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&family=Nanum+Myeongjo:wght@800&family=Rajdhani:wght@600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" as="style" crossorigin
       href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.css">
 
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css">
 
 <style>
+  /* 상단 메뉴용 NanumSquare Neo (네이버 배포 웹폰트) — 받는 동안에도 메뉴 글자가 보이도록 swap */
+  @font-face{
+    font-family: 'NanumSquareNeo';
+    src: url(https://hangeul.pstatic.net/hangeul_static/webfont/NanumSquareNeo/NanumSquareNeoTTF-cBd.woff) format('woff');
+    font-weight: 700;
+    font-display: swap;
+  }
+  @font-face{
+    font-family: 'NanumSquareNeo';
+    src: url(https://hangeul.pstatic.net/hangeul_static/webfont/NanumSquareNeo/NanumSquareNeoTTF-dEb.woff) format('woff');
+    font-weight: 800;
+    font-display: swap;
+  }
   :root{
     --bg: #0F0E0C;
     --bg-alt: #1A1815;
@@ -27,6 +40,9 @@
     --line: #3A342B;
     --font-display: 'Gowun Batang', serif;
     --font-body: 'PretendardVariable', -apple-system, BlinkMacSystemFont, 'Malgun Gothic', sans-serif;
+    --font-tech: 'Rajdhani', var(--font-body); /* 영문 라벨·숫자 (한글은 본문 서체로 표시) */
+    --font-menu: 'NanumSquareNeo', var(--font-body);
+    --font-quote: 'Nanum Myeongjo', serif;
   }
 
   *{ box-sizing: border-box; margin: 0; padding: 0; }
@@ -71,15 +87,15 @@
   }
   .tab{
     position: relative;
-    padding: 10px 22px;
-    font-size: 14.5px;
-    color: var(--ink-soft);
+    padding: 10px 24px;
+    font-size: 16px;
+    font-weight: 700;
+    color: rgba(255,255,255,.72);
     background: transparent;
     border: none;
     cursor: pointer;
-    font-family: inherit;
-    letter-spacing: .02em;
-    transition: color .25s ease;
+    font-family: var(--font-menu);
+    transition: color .25s ease, text-shadow .25s ease;
   }
   .tab::after{
     content: "";
@@ -92,13 +108,15 @@
   .tab:hover{ color: var(--ink); }
   .tab:hover::after{ width: 60%; left: 20%; }
   .tab.is-active{
-    color: var(--ink);
-    font-weight: 700;
+    color: #fff;
+    font-weight: 800;
+    text-shadow: 0 0 12px color-mix(in srgb, var(--accent) 70%, transparent);
   }
   .tab.is-active::after{
     width: 100%; left: 0;
     background: var(--accent);
     height: 2px;
+    box-shadow: 0 0 8px var(--accent), 0 0 16px var(--accent);
   }
 
   /* ---------- 슬라이더(Swiper) ---------- */
@@ -281,7 +299,7 @@
     right: 4vw;
     top: 50%;
     transform: translateY(-50%);
-    font-family: var(--font-display);
+    font-family: var(--font-tech);
     font-weight: 700;
     font-size: clamp(6rem, 17vw, 18rem);
     line-height: 1;
@@ -314,6 +332,8 @@
   .char-meta{
     display: flex;
     gap: 10px;
+    font-family: var(--font-tech);
+    font-weight: 600;
     font-size: calc(13px * var(--fit, 1));
     letter-spacing: .08em;
     color: var(--faction);
@@ -332,6 +352,8 @@
   }
   .char-sub{
     margin-top: calc(8px * var(--fit, 1));
+    font-family: var(--font-tech);
+    font-weight: 600;
     font-size: calc(13px * var(--fit, 1));
     letter-spacing: .25em;
     text-transform: uppercase;
@@ -390,7 +412,8 @@
     width: auto;
     margin: 0 0 12px 4px;
     text-align: left;
-    font-family: var(--font-display);
+    font-family: var(--font-tech);
+    font-weight: 600;
     font-size: 13px;
     letter-spacing: .15em;
     color: var(--ink-soft);
@@ -504,7 +527,7 @@
     right: 8vw;
     top: 50%;
     transform: translateY(-50%);
-    font-family: var(--font-display);
+    font-family: var(--font-tech);
     font-weight: 700;
     font-size: clamp(10rem, 30vw, 28rem);
     line-height: 1;
@@ -526,6 +549,8 @@
     text-shadow: 0 1px 12px rgba(0,0,0,.6);
   }
   .world-kicker{
+    font-family: var(--font-tech);
+    font-weight: 600;
     font-size: calc(13px * var(--fit, 1));
     letter-spacing: .2em;
     color: var(--accent);
@@ -539,6 +564,8 @@
   }
   .world-title-en{
     margin-top: calc(6px * var(--fit, 1));
+    font-family: var(--font-tech);
+    font-weight: 600;
     font-size: calc(13px * var(--fit, 1));
     letter-spacing: .3em;
     text-transform: uppercase;
@@ -594,6 +621,8 @@
   }
   .world-group-name{
     margin-right: 10px;
+    font-family: var(--font-tech);
+    font-weight: 600;
     font-size: 11px;
     letter-spacing: .3em;
     color: var(--accent);
@@ -660,16 +689,29 @@
   }
   /* 첫 문장을 홍보 문구처럼 크게 */
   .about-quote{
-    font-family: var(--font-display);
-    font-weight: 700;
+    font-family: var(--font-quote);
+    font-weight: 800;
+    font-style: italic; /* 한글은 이탤릭 글꼴이 없어 브라우저가 기울여 표시 */
     font-size: calc(clamp(1.7rem, 3.4vw, 2.8rem) * var(--fit, 1));
     line-height: 1.35;
     letter-spacing: -.01em;
     color: var(--ink);
     word-break: keep-all;
-    text-shadow: 0 2px 24px rgba(0,0,0,.6);
+    /* 외곽이 밝게 빛나는 효과 + 배경과 분리되는 어두운 그림자 */
+    text-shadow:
+      0 0 2px rgba(255,255,255,.85),
+      0 0 12px rgba(255,255,255,.45),
+      0 0 30px rgba(150,200,255,.45),
+      0 2px 24px rgba(0,0,0,.6);
   }
-  .about-quote em{ font-style: normal; color: var(--accent); }
+  .about-quote em{
+    font-style: italic;
+    color: var(--accent);
+    text-shadow:
+      0 0 2px rgba(255,255,255,.6),
+      0 0 14px color-mix(in srgb, var(--accent) 80%, transparent),
+      0 0 34px color-mix(in srgb, var(--accent) 60%, transparent);
+  }
   .about-text{
     margin-top: calc(28px * var(--fit, 1));
     font-size: calc(clamp(.95rem, 1.3vw, 1.05rem) * var(--fit, 1));
@@ -1163,7 +1205,9 @@
   // 메인: 화면 왼쪽 절반은 배리어 코어 색, 오른쪽 절반은 이레이안 색 / 캐릭터: 선택한 캐릭터의 진영 색
   // 메뉴에 들어가는 순간 이미 화면에 퍼져 있도록 미리 채워 둠
   (function dust(){
-    if (matchMedia('(prefers-reduced-motion: reduce)').matches) return; // '동작 줄이기' 사용자는 끔
+    // '동작 줄이기'(Windows 애니메이션 효과 끔 등) 환경: 끄지 않고 개수를 줄이고 더 느리게
+    const calm = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const SPEED = calm ? .5 : 1;
     const canvas = document.getElementById('dust');
     const ctx = canvas.getContext('2d');
     const DUST = '#e9e2cf';
@@ -1191,7 +1235,7 @@
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     }
     const section = () => document.body.dataset.section || 'main';
-    const cap = () => (mobile ? 18 : 40); // 동시에 떠 있는 최대 개수
+    const cap = () => Math.round((mobile ? 18 : 40) * (calm ? .6 : 1)); // 동시에 떠 있는 최대 개수
     // 메인 화면 좌우 진영 색 (characters.js 의 FACTIONS 색)
     const FACTION = window.FACTIONS || {};
     const SIDE = {
@@ -1213,7 +1257,7 @@
       motes.push({
         x, y: Math.random() * H,
         side: x < W / 2 ? 'left' : 'right', // 메인: 생겨난 쪽으로 색이 정해짐 (가운데를 넘어가도 유지)
-        vx: (Math.random() - .5) * .2, vy: -(.15 + Math.random() * .4),
+        vx: (Math.random() - .5) * .2 * SPEED, vy: -(.15 + Math.random() * .4) * SPEED,
         life: prefill ? max * (.2 + Math.random() * .4) : 0, max,
         r: .6 + Math.random() * 1.4, sway: Math.random() * 6.28,
       });
@@ -1232,7 +1276,7 @@
         motes = motes.filter(p => p.life++ < p.max && p.y > -20);
         const img = sprite(dustColor()); // 캐릭터를 바꾸면 떠 있는 입자 색도 바로 바뀜
         for (const p of motes) {
-          p.x += p.vx + Math.sin(p.life / 60 + p.sway) * .15; // 좌우로 살랑
+          p.x += p.vx + Math.sin(p.life / 60 + p.sway) * .15 * SPEED; // 좌우로 살랑
           p.y += p.vy;
           const t = p.life / p.max;
           ctx.globalAlpha = Math.min(1, t * 10) * (1 - t) * .7; // 새로 생긴 입자만 짧게 나타남, 끝에서 사라짐
