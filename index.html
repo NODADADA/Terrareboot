@@ -173,7 +173,23 @@
   }
 
   /* 각 슬라이드 배경 톤 (플레이스홀더) */
-  .bg-main{ background: #0f0e0c url('Illust_main.jpg') center / cover no-repeat; }
+  /* 가로 화면 배경 = 메인 영상의 첫 프레임 — 영상이 재생되기 시작해도 장면이 그대로 이어짐 */
+  .bg-main{ background: #0f0e0c url('Illust_main_video.jpg') center / cover no-repeat; }
+  /* 메인 배경 영상 — 가로 화면에서만 불러옴 */
+  .bg-video{
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0;
+  }
+  .bg-video.is-ready{ opacity: 1; }
+  @media (min-aspect-ratio: 1001/1000){
+    /* 영상 속 카메라가 줌 인하므로, 배경의 등장 확대 효과(줌 아웃)와 겹쳐 흔들려 보이지 않도록 끔 */
+    .bg-main, .swiper-slide-active .bg-main{ transform: none; transition: none; }
+  }
+  @media (max-aspect-ratio: 1/1){ .bg-video{ display: none; } }
   /* 세로 화면(폰·세로 태블릿): 세로 구도 일러스트로 교체, 두 주인공이 맞부딪치는 지점을 가운데로 */
   @media (max-aspect-ratio: 1/1){
     .bg-main{ background-image: url('Illust_mobile.jpg'); background-position: 60% center; }
@@ -187,7 +203,12 @@
   }
   .bg-char{ background: radial-gradient(ellipse at 50% 30%, #3a243a 0%, #0f0e0c 70%); }
   .bg-world{ background: radial-gradient(ellipse at 20% 70%, #243a2a 0%, #0f0e0c 70%); }
-  .bg-play{ background: radial-gradient(ellipse at 80% 30%, #3a2424 0%, #0f0e0c 70%); }
+  .bg-play{
+    background:
+      linear-gradient(rgba(95,211,230,.05) 1px, transparent 1px) 0 0 / 48px 48px,
+      linear-gradient(90deg, rgba(95,211,230,.05) 1px, transparent 1px) 0 0 / 48px 48px,
+      radial-gradient(ellipse at 70% 50%, #11333a 0%, #0b1517 55%, #0f0e0c 100%);
+  }
 
   /* ---------- 슬라이드 콘텐츠 (등장 애니메이션) ---------- */
   .slide-content{
@@ -699,6 +720,366 @@
     .world-tab{ font-size: 13px; padding: 6px 8px; }
   }
 
+  /* ---------- 플레이 (가로 슬라이드, 데이터: Play/play.js) ---------- */
+  /* 지휘관의 전술 단말기(홀로그램 테이블) 느낌: 어두운 청록 바탕 + 옅은 격자 */
+  .stage .play-swiper{
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+  }
+  .play-slide{ display: block; }
+  .play-info{
+    position: absolute;
+    left: max(40px, 8vw);
+    top: 50%;
+    transform: translateY(-50%);
+    width: min(460px, 36vw);
+    max-height: calc(100% - 300px); /* 넘치면 JS가 글자를 줄임 */
+    z-index: 2;
+    text-shadow: 0 1px 12px rgba(0,0,0,.6);
+  }
+  .play-info .world-desc p{ word-break: keep-all; }
+  .play-steps{
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px;
+    margin-top: calc(22px * var(--fit, 1));
+    font-family: var(--font-menu);
+    font-weight: 700;
+    font-size: calc(12.5px * var(--fit, 1));
+    color: var(--ink-soft);
+  }
+  .play-steps li{
+    list-style: none;
+    padding: 5px 10px;
+    border: 1px solid color-mix(in srgb, var(--accent) 35%, transparent);
+    background: color-mix(in srgb, var(--accent) 8%, transparent);
+  }
+  .play-steps li.is-key{ color: var(--ink); border-color: var(--accent); background: color-mix(in srgb, var(--accent) 22%, transparent); }
+  .play-steps .arrow{ color: var(--accent); font-size: .9em; }
+  .play-list{
+    margin-top: calc(22px * var(--fit, 1));
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: calc(8px * var(--fit, 1)) 16px;
+    font-size: calc(14px * var(--fit, 1));
+  }
+  .play-list dt{
+    font-family: var(--font-menu);
+    font-weight: 800;
+    color: var(--ink);
+    padding-left: 10px;
+    border-left: 2px solid var(--accent);
+  }
+  .play-list dd{ color: var(--ink-soft); }
+  .play-demo-btn{
+    margin-top: calc(26px * var(--fit, 1));
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 22px;
+    font-family: var(--font-menu);
+    font-weight: 800;
+    font-size: 15px;
+    color: var(--ink);
+    background: color-mix(in srgb, var(--accent) 18%, transparent);
+    border: 1px solid var(--accent);
+    cursor: pointer;
+    clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
+    transition: background .25s ease;
+  }
+  .play-demo-btn:hover{ background: color-mix(in srgb, var(--accent) 35%, transparent); }
+
+  .play-info > *{
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity .6s ease, transform .8s ease;
+  }
+  .play-visual{
+    position: absolute;
+    right: max(40px, 8vw);
+    top: 50%;
+    width: min(600px, 42vw);
+    z-index: 2;
+    opacity: 0;
+    transform: translateY(-50%) translateX(30px);
+    transition: opacity .8s ease .3s, transform 1s ease .3s;
+  }
+  [data-section="play"].swiper-slide-active .play-slide.swiper-slide-active .play-info > *{ opacity: 1; transform: none; }
+  [data-section="play"].swiper-slide-active .play-slide.swiper-slide-active .play-visual{ opacity: 1; transform: translateY(-50%); }
+  .play-slide.swiper-slide-active .play-info > *:nth-child(1){ transition-delay: .15s; }
+  .play-slide.swiper-slide-active .play-info > *:nth-child(2){ transition-delay: .25s; }
+  .play-slide.swiper-slide-active .play-info > *:nth-child(3){ transition-delay: .35s; }
+  .play-slide.swiper-slide-active .play-info > *:nth-child(4){ transition-delay: .45s; }
+  .play-slide.swiper-slide-active .play-info > *:nth-child(5){ transition-delay: .55s; }
+  body[data-section="play"] .scroll-hint{ opacity: 0; }
+
+  /* 홀로그램 패널 공통: 유리판 + 모서리 깎기 */
+  .holo{
+    background:
+      linear-gradient(160deg, color-mix(in srgb, var(--accent) 16%, transparent) 0%, rgba(8,18,20,.55) 60%),
+      repeating-linear-gradient(0deg, rgba(255,255,255,.025) 0 1px, transparent 1px 3px);
+    border: 1px solid color-mix(in srgb, var(--accent) 40%, transparent);
+    backdrop-filter: blur(6px);
+    clip-path: polygon(12px 0, 100% 0, 100% calc(100% - 12px), calc(100% - 12px) 100%, 0 100%, 0 12px);
+  }
+  .visual-caption{
+    margin-top: 14px;
+    font-family: var(--font-tech);
+    font-weight: 600;
+    font-size: 12px;
+    letter-spacing: .25em;
+    color: var(--accent);
+    text-align: center;
+    min-height: 1.5em;
+    transition: color .3s ease;
+  }
+  .visual-caption b{ font-family: var(--font-menu); font-weight: 800; letter-spacing: .02em; color: var(--ink); margin-left: 8px; }
+
+  /* 포지션 */
+  .pos-list{ display: grid; gap: 12px; }
+  .pos-card{
+    padding: 16px 20px 16px 18px;
+    opacity: 0;
+    transform: translateX(24px);
+    transition: opacity .6s ease, transform .8s ease;
+  }
+  .play-slide.swiper-slide-active .pos-card{ opacity: 1; transform: none; }
+  .play-slide.swiper-slide-active .pos-card:nth-child(1){ transition-delay: .35s; }
+  .play-slide.swiper-slide-active .pos-card:nth-child(2){ transition-delay: .5s; }
+  .play-slide.swiper-slide-active .pos-card:nth-child(3){ transition-delay: .65s; }
+  .pos-head{ display: flex; align-items: center; gap: 14px; }
+  .pos-icon{
+    flex: 0 0 auto;
+    width: 38px; height: 38px;
+    color: var(--accent);
+    filter: drop-shadow(0 0 6px color-mix(in srgb, var(--accent) 70%, transparent));
+  }
+  .pos-name{ display: block; font-family: var(--font-head); font-weight: 900; font-size: 1.25rem; line-height: 1.2; }
+  .pos-en{ display: block; font-family: var(--font-tech); font-weight: 600; font-size: 11px; letter-spacing: .3em; text-transform: uppercase; color: var(--accent); }
+  .pos-faces{ margin-left: auto; display: flex; gap: 6px; }
+  .pos-face{
+    width: 34px; height: 34px;
+    padding: 0;
+    border: 1px solid var(--fc, var(--accent));
+    border-radius: 50%;
+    background-color: #15130f;
+    background-repeat: no-repeat;
+    background-size: 340% auto;
+    background-position: var(--thumb-pos, 50% 3%);
+    cursor: pointer;
+    filter: grayscale(.4) brightness(.8);
+    transition: filter .25s ease, transform .25s ease;
+  }
+  .pos-face:hover{ filter: none; transform: translateY(-2px); }
+  .pos-desc{ margin-top: 10px; font-size: 13.5px; line-height: 1.65; color: var(--ink-soft); word-break: keep-all; }
+
+  /* 메모리 칩 (체인 공명·지휘관 스킬 연출) */
+  .chip-stage{
+    --cw: clamp(54px, 5vw, 78px);
+    --ch: calc(var(--cw) * 1.36);
+    --gap: calc(var(--cw) * .34);
+    padding: 34px 0 26px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    transition: opacity .5s ease;
+  }
+  .chip-stage.is-fading{ opacity: 0; }
+  .chip-row{
+    position: relative;
+    width: calc(var(--cw) * 5 + var(--gap) * 4);
+    height: var(--ch);
+  }
+  .chip{
+    --tc: var(--accent);
+    position: absolute;
+    top: 0;
+    left: calc(var(--slot, 0) * (var(--cw) + var(--gap)));
+    width: var(--cw);
+    height: var(--ch);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    background:
+      linear-gradient(165deg, color-mix(in srgb, var(--tc) 30%, transparent) 0%, rgba(8,18,20,.75) 70%),
+      repeating-linear-gradient(0deg, rgba(255,255,255,.04) 0 1px, transparent 1px 3px);
+    border: 1px solid color-mix(in srgb, var(--tc) 55%, transparent);
+    clip-path: polygon(8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%, 0 8px);
+    transition: left .55s cubic-bezier(.5,0,.2,1), transform .35s ease, box-shadow .35s ease, filter .35s ease, background .35s ease;
+  }
+  .chip svg{ width: 42%; height: auto; fill: none; stroke: var(--tc); stroke-width: 1.8; filter: drop-shadow(0 0 4px var(--tc)); }
+  .chip-tag{ font-family: var(--font-menu); font-weight: 800; font-size: calc(var(--cw) * .17); color: var(--ink); white-space: nowrap; }
+  .chip-stars{ position: absolute; top: 5px; left: 0; right: 0; text-align: center; font-size: 9px; letter-spacing: 1px; color: var(--tc); }
+  .chip.is-pick{ transform: translateY(-12px); filter: brightness(1.3); }
+  .chip.is-lit{ filter: brightness(1.35); }
+  .chip-stage.is-burst .chip.is-lit{ animation: chip-burst .9s ease; }
+  @keyframes chip-burst{
+    0%{ transform: none; filter: brightness(1.3); }
+    30%{ transform: translateY(-8px) scale(1.06); filter: brightness(2.2); }
+    100%{ transform: none; filter: brightness(1.35); }
+  }
+  .chip-link{
+    position: absolute;
+    top: 50%;
+    left: calc(var(--at) * (var(--cw) + var(--gap)) + var(--cw));
+    width: var(--gap);
+    height: 3px;
+    margin-top: -1.5px;
+    background: rgba(255,255,255,.08);
+    transition: background .3s ease, box-shadow .3s ease;
+  }
+  .chip-link.is-on{
+    background: var(--tc);
+    box-shadow: 0 0 8px var(--tc), 0 0 18px var(--tc);
+    animation: link-pulse 1.4s ease-in-out infinite;
+  }
+  @keyframes link-pulse{ 50%{ opacity: .55; } }
+  /* 완전 공명: 줄 전체를 훑고 지나가는 빛 */
+  .chip-row::after{
+    content: "";
+    position: absolute;
+    inset: -20px -30px;
+    background: linear-gradient(100deg, transparent 35%, color-mix(in srgb, var(--accent) 45%, transparent) 50%, transparent 65%);
+    background-size: 250% 100%;
+    background-position: 120% 0;
+    opacity: 0;
+    pointer-events: none;
+    mix-blend-mode: screen;
+  }
+  .chip-stage.is-burst .chip-row::after{ animation: sweep 1s ease-out; }
+  @keyframes sweep{ 0%{ opacity: 1; background-position: 120% 0; } 100%{ opacity: 0; background-position: -20% 0; } }
+
+  /* 지휘관 스킬: CP 게이지 + 날아가 찍히는 배지 */
+  @property --cp{ syntax: '<number>'; inherits: false; initial-value: 0; }
+  .cmd-gauge{
+    position: relative;
+    width: 58px; height: 58px;
+    margin-bottom: 30px;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    background:
+      radial-gradient(circle closest-side, rgba(8,18,20,.92) 82%, transparent 84%),
+      conic-gradient(var(--accent) calc(var(--cp) * 1%), rgba(255,255,255,.1) 0);
+    transition: --cp 1.4s ease;
+    font-family: var(--font-tech);
+    font-weight: 700;
+    font-size: 13px;
+    letter-spacing: .1em;
+    color: var(--ink-soft);
+  }
+  .cmd-gauge.is-ready{ color: var(--ink); box-shadow: 0 0 18px color-mix(in srgb, var(--accent) 70%, transparent); }
+  /* 바깥(.cmd-badge)은 위치 이동만, 안쪽(i)은 모양과 '쿵' 확대 — 확대가 이동 거리에 섞이지 않도록 분리 */
+  .cmd-badge{
+    position: absolute;
+    left: 0; top: 0;
+    width: 30px; height: 30px;
+    margin: -15px 0 0 -15px;
+    opacity: 0;
+    pointer-events: none;
+    transition: transform .6s cubic-bezier(.5,0,.2,1), opacity .2s ease;
+    z-index: 3;
+  }
+  .cmd-badge i{
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    border-radius: 50%;
+    background: color-mix(in srgb, var(--accent) 35%, rgba(8,18,20,.8));
+    border: 1px solid var(--accent);
+    box-shadow: 0 0 14px var(--accent);
+  }
+  .cmd-badge svg{ width: 16px; height: 16px; fill: none; stroke: #fff; stroke-width: 2; }
+  .cmd-badge.is-stamp i{ animation: stamp .45s ease; }
+  @keyframes stamp{ 0%{ transform: scale(1.9); } 60%{ transform: scale(.85); } 100%{ transform: none; } }
+
+  /* 수복 작전 지도 */
+  .op-map{ padding: 14px 14px 10px; }
+  .op-map svg{ display: block; width: 100%; height: auto; overflow: visible; }
+  .op-map .edge{ stroke: rgba(255,255,255,.14); stroke-width: 2; fill: none; transition: stroke .5s ease, filter .5s ease; }
+  .op-map .edge.is-hidden-route{ stroke-dasharray: 4 6; }
+  .op-map .edge.is-on{ stroke: var(--accent); filter: drop-shadow(0 0 4px var(--accent)); }
+  .op-map .node{ fill: rgba(8,18,20,.85); stroke: #E0485A; stroke-width: 2; transition: stroke .5s ease, fill .5s ease, filter .5s ease; }
+  .op-map .node.is-on{ stroke: var(--accent); fill: color-mix(in srgb, var(--accent) 22%, rgba(8,18,20,.85)); filter: drop-shadow(0 0 6px var(--accent)); }
+  .op-map .node.is-hidden-route{ stroke-dasharray: 3 3; }
+  .op-map .label{ fill: var(--ink); font-family: var(--font-head); font-weight: 900; font-size: 15px; text-anchor: middle; }
+  .op-map .label-en{ fill: var(--ink-soft); font-family: var(--font-tech); font-weight: 600; font-size: 9px; letter-spacing: .2em; text-anchor: middle; }
+  .op-map .hazard{ fill: none; stroke: #E8C77A; stroke-width: 1.6; stroke-linecap: round; opacity: .85; }
+  .op-map .marker{ fill: #fff; filter: drop-shadow(0 0 6px var(--accent)); transition: transform .6s cubic-bezier(.5,0,.2,1); }
+  .op-legend{
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 6px 18px;
+    margin-top: 6px;
+    font-size: 12px;
+    color: var(--ink-soft);
+  }
+  .op-legend i{ display: inline-block; width: 9px; height: 9px; margin-right: 6px; border-radius: 50%; border: 2px solid; vertical-align: -1px; }
+
+  /* 체험판(Unity WebGL) 창 */
+  .demo-layer{
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+    display: none;
+    place-items: center;
+    background: rgba(5,8,9,.88);
+    backdrop-filter: blur(4px);
+  }
+  .demo-layer.is-open{ display: grid; }
+  .demo-layer iframe{
+    width: min(92vw, calc(84vh * 16 / 9));
+    aspect-ratio: 16 / 9;
+    border: 1px solid var(--accent);
+    background: #000;
+  }
+  .demo-close{
+    position: absolute;
+    top: 18px; right: 22px;
+    width: 44px; height: 44px;
+    font-size: 28px;
+    line-height: 1;
+    color: var(--ink);
+    background: none;
+    border: 0;
+    cursor: pointer;
+  }
+
+  @media (max-width: 720px){
+    .play-visual{
+      left: 16px; right: 16px;
+      top: 118px;
+      width: auto;
+      transform: translateY(10px);
+    }
+    [data-section="play"].swiper-slide-active .play-slide.swiper-slide-active .play-visual{ transform: none; }
+    .play-info{
+      left: 16px; right: 16px; top: auto; bottom: 96px;
+      transform: none;
+      width: auto;
+      max-height: calc(100% - 118px - 210px - 96px);
+    }
+    .play-info .world-title{ font-size: calc(2.1rem * var(--fit, 1)); }
+    .play-info .world-desc{ margin-top: calc(14px * var(--fit, 1)); font-size: calc(13.5px * var(--fit, 1)); }
+    /* 폰: 포지션은 이름·얼굴만 한 줄씩, 설명은 숨김 */
+    .pos-list{ gap: 8px; }
+    .pos-card{ padding: 10px 14px; }
+    .pos-desc{ display: none; }
+    .pos-icon{ width: 28px; height: 28px; }
+    .pos-name{ font-size: 1.05rem; }
+    .pos-face{ width: 28px; height: 28px; }
+    .chip-stage{ --cw: min(54px, 13vw); padding: 10px 0 0; }
+    .cmd-gauge{ width: 46px; height: 46px; margin-bottom: 18px; font-size: 11px; }
+    .op-map{ padding: 8px; }
+    .op-legend{ font-size: 11px; }
+  }
+
   /* ---------- 게임 개요 ---------- */
   .about-content{
     max-width: 820px;
@@ -864,7 +1245,9 @@
 
       <!-- 0. 메인 -->
       <section class="swiper-slide" data-section="main">
-        <div class="slide-bg bg-main"></div>
+        <div class="slide-bg bg-main">
+          <video class="bg-video" data-src="Video_main_web.mp4" muted loop playsinline preload="none" aria-hidden="true"></video>
+        </div>
         <div class="slide-content">
           <h1 class="title"><img class="title-logo" src="Logo1.png" alt="Project Terra Re:Boot"><img class="title-logo title-logo-kr" src="LogoKR.png" alt="프로젝트: 테라 리부트"></h1>
         </div>
@@ -919,27 +1302,13 @@
       <!-- 4. 플레이 -->
       <section class="swiper-slide" data-section="play">
         <div class="slide-bg bg-play"></div>
-        <div class="slide-content">
-          <h2 class="section-title">플레이</h2>
-          <p class="lead">[플레이 방식 소개 — 전투, 탐험, 성장 시스템 등]</p>
-          <div class="card-grid">
-            <div class="card">
-              <h3>전투</h3>
-              <div class="role">COMBAT</div>
-              <p>[전투 시스템의 핵심을 한두 문장으로]</p>
-            </div>
-            <div class="card">
-              <h3>탐험</h3>
-              <div class="role">EXPLORE</div>
-              <p>[탐험/이동에서의 재미 요소]</p>
-            </div>
-            <div class="card">
-              <h3>성장</h3>
-              <div class="role">GROWTH</div>
-              <p>[성장 시스템 개요]</p>
-            </div>
-          </div>
+        <!-- 플레이 슬라이드와 하단 목차는 Play/play.js 데이터로 자동 생성 -->
+        <div class="swiper play-swiper">
+          <div class="swiper-wrapper" id="play-list"></div>
         </div>
+        <nav class="world-index" id="play-index" aria-label="플레이 목차"></nav>
+        <button class="side-arrow side-prev play-prev" aria-label="이전 항목"><svg viewBox="0 0 22 44" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 2 2 22l18 20"/></svg></button>
+        <button class="side-arrow side-next play-next" aria-label="다음 항목"><svg viewBox="0 0 22 44" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 2l18 20L2 42"/></svg></button>
       </section>
 
     </div>
@@ -982,9 +1351,29 @@
   </div>
 </template>
 
+<!-- 플레이 한 장면의 화면 구조 (오른쪽 연출 .play-visual 은 visual 종류에 따라 JS가 채움) -->
+<template id="play-template">
+  <div class="swiper-slide play-slide">
+    <div class="play-info">
+      <div class="world-kicker" data-field="kicker"></div>
+      <h3 class="world-title" data-field="title"></h3>
+      <div class="world-title-en" data-field="titleEn"></div>
+      <div class="world-desc"></div>
+    </div>
+    <div class="play-visual" aria-hidden="true"></div>
+  </div>
+</template>
+
+<!-- 체험판 창 (play.js 의 demo 경로가 있을 때만 사용) -->
+<div class="demo-layer" id="demo-layer" role="dialog" aria-label="체험판">
+  <button class="demo-close" aria-label="닫기">×</button>
+  <iframe title="체험판" allow="autoplay; fullscreen"></iframe>
+</div>
+
 <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
 <script src="Character/characters.js"></script>
 <script src="World/world.js"></script>
+<script src="Play/play.js"></script>
 <script>
   // 캐릭터 슬라이드 생성
   (function buildCharacters(){
@@ -1143,10 +1532,397 @@
     });
   })();
 
+  // 플레이 슬라이드 + 하단 목차 + 오른쪽 연출 생성
+  (function buildPlay(){
+    const list = document.getElementById('play-list');
+    const index = document.getElementById('play-index');
+    const tpl = document.getElementById('play-template');
+    const PLAY = window.PLAY || [];
+
+    // 스킬 태그: 태그마다 색과 모양을 다르게 (색만으로 구분하지 않도록)
+    const TAGS = {
+      '근접': { color: '#FF8A5B', svg: '<path d="M12 2 22 12 12 22 2 12Z"/>' },
+      '사격': { color: '#5FD3E6', svg: '<circle cx="12" cy="12" r="7"/><path d="M12 1v6M12 17v6M1 12h6M17 12h6"/>' },
+      '방어': { color: '#A99BFF', svg: '<path d="M12 2 21 6v6c0 5-4 9-9 10-5-1-9-5-9-10V6Z"/>' },
+    };
+    const ICONS = {
+      '스트라이커': '<path d="M5 27 27 5M17 5h10v10M5 19l8 8"/>',
+      '택티션': '<circle cx="8" cy="8" r="3"/><circle cx="24" cy="8" r="3"/><circle cx="16" cy="24" r="3"/><path d="M11 8h10M10 10.5l4.5 11M22 10.5l-4.5 11"/>',
+      '가디언': '<path d="M16 3 27 7v8c0 7-5 12-11 14C10 27 5 22 5 15V7Z"/><path d="M16 9v14"/>',
+    };
+    const svg = (paths, box = 24) => `<svg viewBox="0 0 ${box} ${box}" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${paths}</svg>`;
+
+    // 칩 한 줄 (체인 공명·지휘관 스킬 공용)
+    function chipRow(tags){
+      const row = document.createElement('div');
+      row.className = 'chip-row';
+      const links = [0, 1, 2, 3].map(at => {
+        const l = document.createElement('span');
+        l.className = 'chip-link';
+        l.style.setProperty('--at', at);
+        row.appendChild(l);
+        return l;
+      });
+      const chips = tags.map(() => {
+        const el = document.createElement('div');
+        el.className = 'chip';
+        el.innerHTML = '<span class="chip-stars"></span><svg viewBox="0 0 24 24"></svg><b class="chip-tag"></b>';
+        row.appendChild(el);
+        return { el, tag: '' };
+      });
+      const api = {
+        row, chips, order: [0, 1, 2, 3, 4],
+        setTag(i, tag){
+          const c = chips[i], t = TAGS[tag];
+          c.tag = tag;
+          c.el.style.setProperty('--tc', t.color);
+          c.el.querySelector('svg').innerHTML = t.svg;
+          c.el.querySelector('.chip-tag').textContent = '#' + tag;
+        },
+        // 칩 위치를 order 대로 놓고, 같은 태그끼리 이웃한 자리의 연결선을 켬. 가장 긴 체인 길이를 돌려줌
+        render(){
+          api.order.forEach((ci, slot) => chips[ci].el.style.setProperty('--slot', slot));
+          chips.forEach(c => c.el.classList.remove('is-lit'));
+          let best = 1, run = 1;
+          links.forEach((l, at) => {
+            const a = chips[api.order[at]], b = chips[api.order[at + 1]];
+            const on = a.tag === b.tag;
+            l.classList.toggle('is-on', on);
+            if (on) {
+              l.style.setProperty('--tc', TAGS[a.tag].color);
+              a.el.classList.add('is-lit'); b.el.classList.add('is-lit');
+            }
+            run = on ? run + 1 : 1;
+            best = Math.max(best, run);
+          });
+          return best;
+        },
+      };
+      tags.forEach((t, i) => api.setTag(i, t));
+      chips.forEach(c => c.el.querySelector('.chip-stars').textContent = '★');
+      return api;
+    }
+
+    // 정해진 순서대로 연출을 돌리고 끝나면 처음부터 반복. 멈추는 함수를 돌려줌
+    function timeline(steps){
+      let k = 0, timer, alive = true;
+      const next = () => {
+        timer = setTimeout(() => {
+          if (!alive) return;
+          steps[k][1]();
+          k = (k + 1) % steps.length;
+          next();
+        }, steps[k][0]);
+      };
+      next();
+      return () => { alive = false; clearTimeout(timer); };
+    }
+    const caption = (el, en, ko) => { el.innerHTML = en + (ko ? `<b>${ko}</b>` : ''); };
+
+    const VISUALS = {
+      positions(box){
+        const wrap = document.createElement('div');
+        wrap.className = 'pos-list';
+        (window.POSITIONS || []).forEach(p => {
+          const card = document.createElement('div');
+          card.className = 'pos-card holo';
+          card.innerHTML = `<div class="pos-head"><span class="pos-icon">${svg(ICONS[p.name] || '', 32)}</span>
+            <div><b class="pos-name"></b><span class="pos-en"></span></div><div class="pos-faces"></div></div><p class="pos-desc"></p>`;
+          card.querySelector('.pos-name').textContent = p.name;
+          card.querySelector('.pos-en').textContent = p.nameEn;
+          card.querySelector('.pos-desc').textContent = p.desc;
+          // 이 포지션의 캐릭터 얼굴 — 누르면 캐릭터 메뉴의 그 캐릭터로 이동
+          const faces = card.querySelector('.pos-faces');
+          (window.CHARACTERS || []).forEach((c, i) => {
+            if (c.role !== p.name) return;
+            const f = document.createElement('button');
+            f.className = 'pos-face';
+            f.title = c.name;
+            f.setAttribute('aria-label', c.name);
+            f.style.backgroundImage = `url('${c.image}')`;
+            if (c.thumbPos) f.style.setProperty('--thumb-pos', c.thumbPos);
+            const faction = (window.FACTIONS || {})[c.faction];
+            if (faction) f.style.setProperty('--fc', faction.color);
+            f.addEventListener('click', () => {
+              swiper.slideTo(2);
+              charSwiper.slideTo(i, 0);
+            });
+            faces.appendChild(f);
+          });
+          wrap.appendChild(card);
+        });
+        box.appendChild(wrap);
+        box.removeAttribute('aria-hidden');
+      },
+
+      // 떨어진 칩을 옮겨 붙여 3체인 '완전 공명'을 만드는 장면
+      chain(box){
+        const stage = document.createElement('div');
+        stage.className = 'chip-stage holo';
+        const tags = ['근접', '방어', '근접', '근접', '사격'];
+        const r = chipRow(tags);
+        const cap = document.createElement('div');
+        cap.className = 'visual-caption';
+        stage.append(r.row, cap);
+        box.appendChild(stage);
+        const reset = () => {
+          tags.forEach((t, i) => r.setTag(i, t));
+          r.order = [0, 1, 2, 3, 4];
+          r.chips.forEach(c => { c.el.classList.remove('is-pick'); c.el.querySelector('.chip-stars').textContent = '★'; });
+          stage.classList.remove('is-burst', 'is-fading');
+          r.render();
+          caption(cap, '2 CHAIN', '공명 대기');
+        };
+        reset();
+        return () => {
+          reset();
+          return timeline([
+            [1400, () => { r.chips[0].el.classList.add('is-pick'); r.chips[1].el.classList.add('is-pick'); caption(cap, 'SWAP', '칩 이동'); }],
+            [600, () => { r.order = [1, 0, 2, 3, 4]; r.render(); }],
+            [650, () => {
+              r.chips.forEach(c => c.el.classList.remove('is-pick'));
+              r.render();
+              [0, 2, 3].forEach(i => r.chips[i].el.querySelector('.chip-stars').textContent = '★★★');
+              stage.classList.add('is-burst');
+              caption(cap, '3 CHAIN', '완전 공명');
+            }],
+            [2800, () => stage.classList.add('is-fading')],
+            [600, reset],
+          ]);
+        };
+      },
+
+      // 지휘력이 차면 배지를 끌어다 가운데 칩에 찍어 태그를 바꾸는 장면 (임시 발령)
+      command(box){
+        const stage = document.createElement('div');
+        stage.className = 'chip-stage holo';
+        stage.style.position = 'relative';
+        const gauge = document.createElement('div');
+        gauge.className = 'cmd-gauge';
+        gauge.textContent = 'CP';
+        const tags = ['방어', '근접', '사격', '근접', '방어'];
+        const r = chipRow(tags);
+        const badge = document.createElement('div');
+        badge.className = 'cmd-badge';
+        badge.innerHTML = `<i>${svg('<path d="M12 3v18M3 12h18"/>')}</i>`;
+        const cap = document.createElement('div');
+        cap.className = 'visual-caption';
+        stage.append(gauge, r.row, cap, badge);
+        box.appendChild(stage);
+        // 배지를 el 의 가운데로 (onTop 이면 el 윗변 가운데 — 칩 글자를 가리지 않게)
+        const moveBadge = (el, onTop) => {
+          const a = el.getBoundingClientRect(), s = stage.getBoundingClientRect();
+          const x = a.left - s.left + a.width / 2;
+          const y = a.top - s.top + (onTop ? 0 : a.height / 2);
+          badge.style.transform = `translate(${x}px, ${y}px)`;
+        };
+        const reset = () => {
+          tags.forEach((t, i) => r.setTag(i, t));
+          stage.classList.remove('is-burst', 'is-fading');
+          gauge.classList.remove('is-ready');
+          gauge.style.transition = 'none';
+          gauge.style.setProperty('--cp', 0);
+          gauge.offsetWidth; // 위 값을 즉시 적용한 뒤 다시 애니메이션 켜기
+          gauge.style.transition = '';
+          badge.style.transition = 'none';
+          badge.style.opacity = 0;
+          badge.classList.remove('is-stamp');
+          moveBadge(gauge);
+          badge.offsetWidth;
+          badge.style.transition = '';
+          r.render();
+          caption(cap, 'NO LINK', '패가 꼬였다');
+        };
+        reset();
+        return () => {
+          reset();
+          return timeline([
+            [900, () => { gauge.style.setProperty('--cp', 100); caption(cap, 'CP CHARGE', '지휘력 충전'); }],
+            [1500, () => { gauge.classList.add('is-ready'); moveBadge(gauge); badge.style.opacity = 1; caption(cap, 'COMMAND', '임시 발령'); }],
+            [500, () => moveBadge(r.chips[2].el, true)],
+            [650, () => {
+              badge.classList.add('is-stamp');
+              r.setTag(2, '근접');
+              r.render();
+              stage.classList.add('is-burst');
+              caption(cap, '3 CHAIN', '역전');
+            }],
+            [2600, () => stage.classList.add('is-fading')],
+            [600, reset],
+          ]);
+        };
+      },
+
+      // 네오 에덴 → 러스트 정글 → 테라 노바, 거점이 차례로 수복되는 작전 지도
+      map(box){
+        const NODES = [
+          { id: 'E', x: 70, y: 300, main: true, name: '네오 에덴', en: 'NEO-EDEN' },
+          { id: 'a', x: 150, y: 245 },
+          { id: 'b', x: 215, y: 295 },
+          { id: 'R', x: 300, y: 205, main: true, name: '러스트 정글', en: 'RUST JUNGLE', storm: true },
+          { id: 'c', x: 380, y: 260, night: true },
+          { id: 'h', x: 330, y: 95, hidden: true },
+          { id: 'd', x: 430, y: 160 },
+          { id: 'T', x: 530, y: 85, main: true, name: '테라 노바', en: 'TERRA NOVA' },
+        ];
+        const EDGES = [['E', 'a'], ['a', 'b'], ['b', 'R'], ['R', 'c'], ['c', 'd'], ['d', 'T'], ['R', 'h', true]];
+        const ROUTE = ['E', 'a', 'b', 'R', 'c', 'd', 'T'];
+        const byId = Object.fromEntries(NODES.map(n => [n.id, n]));
+        const hex = (x, y, s) => [0, 1, 2, 3, 4, 5].map(k => {
+          const t = Math.PI / 3 * k + Math.PI / 6;
+          return `${(x + s * Math.cos(t)).toFixed(1)},${(y + s * Math.sin(t)).toFixed(1)}`;
+        }).join(' ');
+        let html = '';
+        EDGES.forEach(([p, q, hidden]) => {
+          const A = byId[p], B = byId[q];
+          html += `<path class="edge${hidden ? ' is-hidden-route' : ''}" data-edge="${p}${q}" d="M${A.x} ${A.y} L${B.x} ${B.y}"/>`;
+        });
+        NODES.forEach(n => {
+          const cls = `node${n.hidden ? ' is-hidden-route' : ''}`;
+          html += n.main
+            ? `<polygon class="${cls}" data-node="${n.id}" points="${hex(n.x, n.y, 20)}"/>`
+            : `<circle class="${cls}" data-node="${n.id}" cx="${n.x}" cy="${n.y}" r="8"/>`;
+          if (n.name) html += `<text class="label" x="${n.x}" y="${n.y + 42}">${n.name}</text><text class="label-en" x="${n.x}" y="${n.y + 56}">${n.en}</text>`;
+          // 더스트 폭풍(물결) / 밤(초승달) 표시
+          if (n.storm) html += `<path class="hazard" d="M${n.x + 26} ${n.y - 30}q5 -5 10 0t10 0t10 0M${n.x + 26} ${n.y - 22}q5 -5 10 0t10 0t10 0"/>`;
+          if (n.night) html += `<path class="hazard" d="M${n.x + 22} ${n.y - 28}a9 9 0 1 0 9 12a7 7 0 1 1 -9 -12z"/>`;
+        });
+        html += `<path class="marker" d="M0 -26 7 -40h-14z"/>`;
+        box.innerHTML = `<div class="op-map holo"><svg viewBox="0 0 600 380">${html}</svg>
+          <div class="op-legend"><span><i style="border-color:#E0485A"></i>적 점령</span><span><i style="border-color:var(--accent)"></i>수복</span>
+          <span><i style="border-style:dashed;border-color:var(--ink-soft)"></i>히든 루트</span><span style="color:#E8C77A">≋ 더스트 폭풍 · ☾ 야간</span></div></div>`;
+        const s = box.querySelector('svg');
+        const marker = s.querySelector('.marker');
+        const node = id => s.querySelector(`[data-node="${id}"]`);
+        const edge = (p, q) => s.querySelector(`[data-edge="${p}${q}"]`);
+        const moveTo = id => { const n = byId[id]; marker.style.transform = `translate(${n.x}px, ${n.y}px)`; };
+        const reset = () => {
+          s.querySelectorAll('.is-on').forEach(el => el.classList.remove('is-on'));
+          node('E').classList.add('is-on'); // 출발지(안전지대)는 처음부터 아군
+          marker.style.transition = 'none';
+          moveTo('E');
+          marker.getBBox();
+          marker.style.transition = '';
+        };
+        reset();
+        return () => {
+          reset();
+          const steps = ROUTE.slice(1).flatMap((id, k) => [
+            [k === 0 ? 900 : 500, () => moveTo(id)],
+            [650, () => { node(id).classList.add('is-on'); edge(ROUTE[k], id).classList.add('is-on'); }],
+          ]);
+          steps.push([2600, reset]);
+          return timeline(steps);
+        };
+      },
+    };
+
+    const starters = [];
+    PLAY.forEach((p, i) => {
+      const slide = tpl.content.firstElementChild.cloneNode(true);
+      slide.querySelectorAll('[data-field]').forEach(el => {
+        const value = p[el.dataset.field];
+        if (value) el.textContent = value;
+        else el.remove();
+      });
+      const info = slide.querySelector('.play-info');
+      const desc = slide.querySelector('.world-desc');
+      (p.desc || []).forEach(text => {
+        const el = document.createElement('p');
+        el.textContent = text;
+        desc.appendChild(el);
+      });
+      if (p.steps) { // 턴 흐름: 체인 공명이 일어나는 '전술' 단계를 강조
+        const ol = document.createElement('ol');
+        ol.className = 'play-steps';
+        p.steps.forEach((s, k) => {
+          if (k) ol.insertAdjacentHTML('beforeend', '<span class="arrow" aria-hidden="true">▶</span>');
+          const li = document.createElement('li');
+          li.textContent = s;
+          if (s === '전술') li.className = 'is-key';
+          ol.appendChild(li);
+        });
+        info.appendChild(ol);
+      }
+      if (p.list) {
+        const dl = document.createElement('dl');
+        dl.className = 'play-list';
+        p.list.forEach(([name, text]) => {
+          dl.insertAdjacentHTML('beforeend', '<dt></dt><dd></dd>');
+          dl.lastElementChild.previousElementSibling.textContent = name;
+          dl.lastElementChild.textContent = text;
+        });
+        info.appendChild(dl);
+      }
+      if (p.demo) {
+        const btn = document.createElement('button');
+        btn.className = 'play-demo-btn';
+        btn.innerHTML = '직접 해보기 <span aria-hidden="true">▶</span>';
+        btn.addEventListener('click', () => openDemo(p.demo));
+        info.appendChild(btn);
+      }
+      list.appendChild(slide);
+      const make = VISUALS[p.visual];
+      starters[i] = make ? make(slide.querySelector('.play-visual')) : null;
+
+      const tab = document.createElement('button');
+      tab.className = 'world-tab' + (i === 0 ? ' is-active' : '');
+      tab.textContent = p.label;
+      tab.addEventListener('click', () => playSwiper.slideTo(i));
+      index.appendChild(tab);
+    });
+    const group = document.createElement('span');
+    group.className = 'world-group-name';
+    group.textContent = 'SYSTEM';
+    index.prepend(group);
+    index.classList.add('world-group');
+
+    // 연출은 플레이 메뉴에서 그 슬라이드를 보고 있을 때만 돌림
+    let stop = null;
+    window.syncPlayVisual = () => {
+      if (stop) { stop(); stop = null; }
+      if (document.body.dataset.section !== 'play' || !window.playSwiper) return;
+      const start = starters[playSwiper.activeIndex];
+      if (typeof start === 'function') stop = start();
+    };
+
+    window.playSwiper = new Swiper('.play-swiper', {
+      effect: 'fade',
+      fadeEffect: { crossFade: true },
+      speed: 700,
+      rewind: true,
+      keyboard: { enabled: false },
+      navigation: { prevEl: '.play-prev', nextEl: '.play-next' },
+      on: {
+        slideChange(){
+          index.querySelectorAll('.world-tab').forEach((el, idx) => {
+            el.classList.toggle('is-active', idx === this.activeIndex);
+          });
+          updateAccent();
+          syncPlayVisual();
+        },
+      },
+    });
+
+    // 체험판 창
+    const layer = document.getElementById('demo-layer');
+    const frame = layer.querySelector('iframe');
+    function openDemo(src){
+      frame.src = src;
+      layer.classList.add('is-open');
+    }
+    function closeDemo(){
+      layer.classList.remove('is-open');
+      frame.src = 'about:blank'; // 닫으면 게임도 완전히 멈춤
+    }
+    layer.querySelector('.demo-close').addEventListener('click', closeDemo);
+    addEventListener('keydown', e => { if (e.key === 'Escape' && layer.classList.contains('is-open')) closeDemo(); });
+  })();
+
   // 창 높이에 맞춰 글자 크기 자동 조절 (스크롤바 없이 전부 보이도록)
   // 글 상자(max-height)보다 내용이 길면 --fit 값을 조금씩 줄여서 맞춤
   function fitText(){
-    document.querySelectorAll('.char-info, .world-info, .about-content').forEach(box => {
+    document.querySelectorAll('.char-info, .world-info, .play-info, .about-content').forEach(box => {
       let fit = 1;
       box.style.setProperty('--fit', fit);
       const padBottom = parseFloat(getComputedStyle(box).paddingBottom) || 0;
@@ -1174,7 +1950,7 @@
   const SCENE_ACCENT = {
     main: [(FACTIONS['배리어 코어'] || {}).color, (FACTIONS['이레이안'] || {}).color],
     about: '#E8B96A', // 아크의 빛 (이레이안의 선언 '소생'도 금빛으로)
-    play: '#D9A066',  // 어두운 적갈색 배경에 맞춘 따뜻한 색 (배경 이미지가 생기면 다시 고르기)
+    play: '#5FD3E6',  // 전술 단말기의 홀로그램 시안 (슬라이드마다는 play.js 의 accent)
   };
   function updateAccent(){
     const section = document.body.dataset.section || 'main';
@@ -1185,6 +1961,9 @@
     }
     if (section === 'world' && window.worldSwiper) {
       color = (WORLD[worldSwiper.activeIndex] || {}).accent;
+    }
+    if (section === 'play' && window.playSwiper) {
+      color = (PLAY[playSwiper.activeIndex] || {}).accent || color;
     }
     const [a, b] = Array.isArray(color) ? color : [color, color];
     const style = document.body.style;
@@ -1221,14 +2000,16 @@
         const section = this.slides[i].dataset.section;
         document.body.dataset.section = section;
         updateAccent();
-        const inner = { character: charSwiper, world: worldSwiper };
+        syncPlayVisual();
+        mainVideo(section === 'main');
+        const inner = { character: charSwiper, world: worldSwiper, play: playSwiper };
         Object.entries(inner).forEach(([key, s]) => {
           if (key === section) s.keyboard.enable();
           else s.keyboard.disable();
         });
 
         // 다른 메뉴로 넘어가면, 전환 애니메이션이 끝난 뒤 캐릭터·세계관을 첫 항목으로 되돌림
-        // → 다시 들어오면 항상 '카일', 세계관 첫 이야기부터 보임
+        // → 다시 들어오면 항상 '카일', 세계관·플레이 첫 항목부터 보임
         clearTimeout(resetTimer);
         resetTimer = setTimeout(() => {
           const now = document.body.dataset.section;
@@ -1240,6 +2021,21 @@
     },
   });
   updateAccent(); // 첫 화면(메인) 색
+
+  // 메인 배경 영상: 가로 화면에서만 불러오고(세로 폰은 세로 일러스트 유지), 메인을 벗어나면 멈춤
+  function mainVideo(play){
+    const v = document.querySelector('.bg-video');
+    if (!v || !matchMedia('(min-aspect-ratio: 1001/1000)').matches) return;
+    if (!v.src) {
+      if (!play) return;
+      // 배경 그림이 영상 첫 프레임과 같으므로, 재생이 시작되면 바로 바꿔도 티가 나지 않음
+      v.addEventListener('playing', () => v.classList.add('is-ready'), { once: true });
+      v.src = v.dataset.src;
+    }
+    if (play) v.play().catch(() => {});
+    else v.pause();
+  }
+  mainVideo(true);
 
   document.querySelectorAll('[data-goto]').forEach(el => {
     el.addEventListener('click', (e) => {
