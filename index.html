@@ -28,6 +28,15 @@
     font-weight: 800;
     font-display: swap;
   }
+  @font-face{
+    font-family: 'NanumSquareNeo';
+    src: url(https://hangeul.pstatic.net/hangeul_static/webfont/NanumSquareNeo/NanumSquareNeoTTF-eHv.woff) format('woff');
+    font-weight: 900;
+    font-display: swap;
+  }
+  /* 강조색을 '색'으로 등록 → 화면이 바뀔 때 색도 서서히 바뀜 (값은 아래 '장면 컬러' 스크립트가 정함) */
+  @property --accent{ syntax: '<color>'; inherits: true; initial-value: #2998ff; }
+  @property --accent-2{ syntax: '<color>'; inherits: true; initial-value: #2998ff; }
   :root{
     --bg: #0F0E0C;
     --bg-alt: #1A1815;
@@ -35,6 +44,7 @@
     --ink: #F1EEE4;
     --ink-soft: #A9A296;
     --accent: #2998ff;
+    --accent-2: var(--accent); /* 그라데이션 끝 색 (메인: 이레이안 금색) */
     --accent-soft: #7C9473;
     --gold: #A9773A;
     --line: #3A342B;
@@ -42,6 +52,7 @@
     --font-body: 'PretendardVariable', -apple-system, BlinkMacSystemFont, 'Malgun Gothic', sans-serif;
     --font-tech: 'Rajdhani', var(--font-body); /* 영문 라벨·숫자 (한글은 본문 서체로 표시) */
     --font-menu: 'NanumSquareNeo', var(--font-body);
+    --font-head: 'NanumSquareNeo', var(--font-body); /* 한글 제목·이름 (Heavy 900) */
     --font-quote: 'Nanum Myeongjo', serif;
   }
 
@@ -53,6 +64,7 @@
     font-family: var(--font-body);
     line-height: 1.7;
     -webkit-font-smoothing: antialiased;
+    transition: --accent .9s ease, --accent-2 .9s ease; /* 슬라이드 전환(0.9초)과 함께 색 변경 */
   }
   ::selection{ background: var(--accent); color: #000; }
 
@@ -102,7 +114,7 @@
     position: absolute;
     left: 50%; bottom: 4px;
     width: 0; height: 1px;
-    background: var(--accent);
+    background: linear-gradient(90deg, var(--accent), var(--accent-2));
     transition: width .35s ease, left .35s ease;
   }
   .tab:hover{ color: var(--ink); }
@@ -110,13 +122,14 @@
   .tab.is-active{
     color: #fff;
     font-weight: 800;
-    text-shadow: 0 0 12px color-mix(in srgb, var(--accent) 70%, transparent);
+    text-shadow: 0 0 12px color-mix(in srgb, color-mix(in srgb, var(--accent) 50%, var(--accent-2)) 70%, transparent);
   }
   .tab.is-active::after{
     width: 100%; left: 0;
-    background: var(--accent);
+    background: linear-gradient(90deg, var(--accent), var(--accent-2));
     height: 2px;
-    box-shadow: 0 0 8px var(--accent), 0 0 16px var(--accent);
+    /* 빛도 왼쪽은 --accent, 오른쪽은 --accent-2 쪽으로 */
+    box-shadow: -6px 0 12px var(--accent), 6px 0 12px var(--accent-2), 0 0 16px color-mix(in srgb, var(--accent) 50%, var(--accent-2));
   }
 
   /* ---------- 슬라이더(Swiper) ---------- */
@@ -229,8 +242,9 @@
     .bg-main{ background-position: center 85%; }
   }
   h2.section-title{
-    font-family: var(--font-display);
-    font-weight: 700;
+    font-family: var(--font-head);
+    font-weight: 900;
+    letter-spacing: -.01em;
     font-size: clamp(2rem, 4.5vw, 3rem);
     line-height: 1.2;
   }
@@ -261,7 +275,8 @@
     border-color: var(--accent);
   }
   .card h3{
-    font-family: var(--font-display);
+    font-family: var(--font-head);
+    font-weight: 900;
     font-size: 1.2rem;
     margin-bottom: 6px;
   }
@@ -345,8 +360,9 @@
   }
   .char-name{
     margin-top: calc(10px * var(--fit, 1));
-    font-family: var(--font-display);
-    font-weight: 700;
+    font-family: var(--font-head);
+    font-weight: 900;
+    letter-spacing: -.01em;
     font-size: calc(clamp(2.6rem, 5vw, 4rem) * var(--fit, 1));
     line-height: 1.1;
   }
@@ -557,8 +573,9 @@
   }
   .world-title{
     margin-top: calc(10px * var(--fit, 1));
-    font-family: var(--font-display);
-    font-weight: 700;
+    font-family: var(--font-head);
+    font-weight: 900;
+    letter-spacing: -.01em;
     font-size: calc(clamp(2.4rem, 4.6vw, 3.8rem) * var(--fit, 1));
     line-height: 1.15;
   }
@@ -1013,7 +1030,7 @@
         formatFractionCurrent: pad,
         formatFractionTotal: pad,
       },
-      on: { slideChange: markRoster },
+      on: { slideChange(){ markRoster(); updateAccent(); } },
     });
 
     // 캐릭터 선택 로스터: 진영이 바뀌는 자리에 구분선
@@ -1112,6 +1129,7 @@
           index.querySelectorAll('.world-tab').forEach((el, idx) => {
             el.classList.toggle('is-active', idx === this.activeIndex);
           });
+          updateAccent();
           // 목차가 화면보다 넓을 때(모바일) 현재 항목이 가운데 오도록 목차를 스크롤
           const active = index.querySelector('.world-tab.is-active');
           if (active && index.scrollWidth > index.clientWidth) {
@@ -1150,6 +1168,35 @@
   fitText();
   if (document.fonts) document.fonts.ready.then(fitText);
 
+  // ---------- 장면 컬러 ----------
+  // 파란색으로 칠하던 강조색(--accent)을 지금 보이는 화면에 맞춰 바꿈 (흰 글씨는 그대로)
+  // 메인: 두 진영 색 그라데이션 / 캐릭터: 선택한 캐릭터의 진영 색 / 세계관: world.js 의 accent
+  const SCENE_ACCENT = {
+    main: [(FACTIONS['배리어 코어'] || {}).color, (FACTIONS['이레이안'] || {}).color],
+    about: '#E8B96A', // 아크의 빛 (이레이안의 선언 '소생'도 금빛으로)
+    play: '#D9A066',  // 어두운 적갈색 배경에 맞춘 따뜻한 색 (배경 이미지가 생기면 다시 고르기)
+  };
+  function updateAccent(){
+    const section = document.body.dataset.section || 'main';
+    let color = SCENE_ACCENT[section];
+    if (section === 'character' && window.charSwiper) {
+      const c = CHARACTERS[charSwiper.activeIndex];
+      color = c && (FACTIONS[c.faction] || {}).color;
+    }
+    if (section === 'world' && window.worldSwiper) {
+      color = (WORLD[worldSwiper.activeIndex] || {}).accent;
+    }
+    const [a, b] = Array.isArray(color) ? color : [color, color];
+    const style = document.body.style;
+    if (a) {
+      style.setProperty('--accent', a);
+      style.setProperty('--accent-2', b || a);
+    } else { // 색을 정하지 않은 곳은 기본 파랑(:root)으로
+      style.removeProperty('--accent');
+      style.removeProperty('--accent-2');
+    }
+  }
+
   let resetTimer;
   const swiper = new Swiper('.stage > .swiper', {
     direction: 'vertical',
@@ -1173,6 +1220,7 @@
         // 캐릭터/세계관 섹션에서만 좌우 방향키로 내부 슬라이드 넘기기
         const section = this.slides[i].dataset.section;
         document.body.dataset.section = section;
+        updateAccent();
         const inner = { character: charSwiper, world: worldSwiper };
         Object.entries(inner).forEach(([key, s]) => {
           if (key === section) s.keyboard.enable();
@@ -1191,6 +1239,7 @@
       },
     },
   });
+  updateAccent(); // 첫 화면(메인) 색
 
   document.querySelectorAll('[data-goto]').forEach(el => {
     el.addEventListener('click', (e) => {
