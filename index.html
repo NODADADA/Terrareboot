@@ -541,6 +541,8 @@
       -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 24px, #000 calc(100% - 24px), transparent 100%);
               mask-image: linear-gradient(90deg, transparent 0, #000 24px, #000 calc(100% - 24px), transparent 100%);
     }
+    /* 이 줄 위에서는 가로 스크롤만 — 손가락이 조금 비스듬히 움직여도 메뉴 전환에 뺏기지 않게 (HTML의 swiper-no-swiping 과 함께) */
+    .char-roster, .world-index{ touch-action: pan-x; overscroll-behavior-x: contain; }
     .char-roster::-webkit-scrollbar{ display: none; }
     body[data-section="character"] .scroll-hint{ opacity: 0; }
   }
@@ -742,10 +744,13 @@
     inset: 0;
     z-index: 1;
   }
+  /* 넓은 화면: 글과 오른쪽 연출이 양 끝으로 벌어지지 않도록 가운데 1240px 폭 안에 모음 */
+  [data-section="play"]{ --play-x: max(40px, 8vw, calc(50% - 620px)); }
+  @media (min-width: 721px){ #play-index{ left: var(--play-x); } }
   .play-slide{ display: block; }
   .play-info{
     position: absolute;
-    left: max(40px, 8vw);
+    left: var(--play-x);
     top: 50%;
     transform: translateY(-50%);
     width: min(460px, 36vw);
@@ -813,7 +818,7 @@
   }
   .play-visual{
     position: absolute;
-    right: max(40px, 8vw);
+    right: var(--play-x);
     top: 50%;
     width: min(600px, 42vw);
     z-index: 2;
@@ -1082,10 +1087,31 @@
     }
     .play-info .world-title{ font-size: calc(2.1rem * var(--fit, 1)); }
     .play-info .world-desc{ margin-top: calc(14px * var(--fit, 1)); font-size: calc(13.5px * var(--fit, 1)); }
-    /* 폰: 포지션은 이름·얼굴만 한 줄씩, 설명은 숨김 */
+    /* 폰: 포지션은 이름·얼굴만 한 줄씩 — 상자를 누르면 그 상자만 펼쳐져 설명이 보임 */
     .pos-list{ gap: 8px; }
-    .pos-card{ padding: 10px 14px; }
-    .pos-desc{ display: none; }
+    .pos-card{ padding: 10px 14px; cursor: pointer; }
+    .pos-desc{
+      max-height: 0;
+      margin-top: 0;
+      overflow: hidden;
+      font-size: 13px;
+      transition: max-height .35s ease, margin-top .35s ease;
+    }
+    .pos-card.is-open .pos-desc{ max-height: 8em; margin-top: 8px; }
+    /* 펼침 표시 (▾) — 펼치면 뒤집힘 */
+    .pos-head::after{
+      content: "";
+      flex: 0 0 auto;
+      width: 7px; height: 7px;
+      margin: 0 2px 4px 2px;
+      border: solid var(--accent);
+      border-width: 0 1.5px 1.5px 0;
+      transform: rotate(45deg);
+      transition: transform .3s ease, margin .3s ease;
+    }
+    .pos-card.is-open .pos-head::after{ transform: rotate(-135deg); margin: 4px 2px 0 2px; }
+    /* 상자가 펼쳐지는 만큼 아래 글 상자 높이를 미리 비워 둠 (넘치면 JS가 글자를 줄임) */
+    .play-slide[data-visual="positions"] .play-info{ max-height: calc(100% - 118px - 300px - 96px); }
     .pos-icon{ width: 28px; height: 28px; }
     .pos-name{ font-size: 1.05rem; }
     .pos-face{ width: 28px; height: 28px; }
@@ -1298,7 +1324,7 @@
         <button class="side-arrow side-next char-next" aria-label="다음 캐릭터"><svg viewBox="0 0 22 44" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 2l18 20L2 42"/></svg></button>
         <div class="char-pick">
           <div class="char-count"></div>
-          <nav class="char-roster" id="char-roster" aria-label="캐릭터 선택"></nav>
+          <nav class="char-roster swiper-no-swiping" id="char-roster" aria-label="캐릭터 선택"></nav>
         </div>
       </section>
 
@@ -1309,7 +1335,7 @@
         <div class="swiper world-swiper">
           <div class="swiper-wrapper" id="world-list"></div>
         </div>
-        <nav class="world-index" id="world-index" aria-label="세계관 목차"></nav>
+        <nav class="world-index swiper-no-swiping" id="world-index" aria-label="세계관 목차"></nav>
         <button class="side-arrow side-prev world-prev" aria-label="이전 항목"><svg viewBox="0 0 22 44" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 2 2 22l18 20"/></svg></button>
         <button class="side-arrow side-next world-next" aria-label="다음 항목"><svg viewBox="0 0 22 44" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 2l18 20L2 42"/></svg></button>
       </section>
@@ -1321,7 +1347,7 @@
         <div class="swiper play-swiper">
           <div class="swiper-wrapper" id="play-list"></div>
         </div>
-        <nav class="world-index" id="play-index" aria-label="플레이 목차"></nav>
+        <nav class="world-index swiper-no-swiping" id="play-index" aria-label="플레이 목차"></nav>
         <button class="side-arrow side-prev play-prev" aria-label="이전 항목"><svg viewBox="0 0 22 44" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 2 2 22l18 20"/></svg></button>
         <button class="side-arrow side-next play-next" aria-label="다음 항목"><svg viewBox="0 0 22 44" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 2l18 20L2 42"/></svg></button>
       </section>
@@ -1390,6 +1416,12 @@
 <script src="World/world.js"></script>
 <script src="Play/play.js"></script>
 <script>
+  // 가로로 넘치는 줄(모바일의 캐릭터 로스터·하단 목차)에서 선택된 항목이 가운데 오도록 스크롤
+  function centerInBar(bar, active){
+    if (!active || bar.scrollWidth <= bar.clientWidth) return;
+    bar.scrollTo({ left: active.offsetLeft - (bar.clientWidth - active.offsetWidth) / 2, behavior: 'smooth' });
+  }
+
   // 캐릭터 슬라이드 생성
   (function buildCharacters(){
     const list = document.getElementById('char-list');
@@ -1465,11 +1497,7 @@
       const cards = document.querySelectorAll('.roster-card');
       cards.forEach(el => el.classList.toggle('is-active', +el.dataset.index === charSwiper.activeIndex));
       // 로스터가 화면보다 넓을 때(모바일) 선택된 카드를 가운데로
-      const active = document.querySelector('.roster-card.is-active');
-      const box = document.getElementById('char-roster');
-      if (active && box.scrollWidth > box.clientWidth) {
-        box.scrollTo({ left: active.offsetLeft - (box.clientWidth - active.offsetWidth) / 2, behavior: 'smooth' });
-      }
+      centerInBar(roster, roster.querySelector('.roster-card.is-active'));
     }
   })();
 
@@ -1535,13 +1563,7 @@
           });
           updateAccent();
           // 목차가 화면보다 넓을 때(모바일) 현재 항목이 가운데 오도록 목차를 스크롤
-          const active = index.querySelector('.world-tab.is-active');
-          if (active && index.scrollWidth > index.clientWidth) {
-            index.scrollTo({
-              left: active.offsetLeft - (index.clientWidth - active.offsetWidth) / 2,
-              behavior: 'smooth',
-            });
-          }
+          centerInBar(index, index.querySelector('.world-tab.is-active'));
         },
       },
     });
@@ -1646,6 +1668,12 @@
           card.querySelector('.pos-name').textContent = p.name;
           card.querySelector('.pos-en').textContent = p.nameEn;
           card.querySelector('.pos-desc').textContent = p.desc;
+          // 폰에서는 설명이 접혀 있음: 누른 상자만 펼치고 나머지는 접음 (얼굴 버튼은 캐릭터로 이동하므로 제외)
+          card.addEventListener('click', e => {
+            if (e.target.closest('.pos-face')) return;
+            const open = !card.classList.contains('is-open');
+            wrap.querySelectorAll('.pos-card').forEach(el => el.classList.toggle('is-open', open && el === card));
+          });
           // 이 포지션의 캐릭터 얼굴 — 누르면 캐릭터 메뉴의 그 캐릭터로 이동
           const faces = card.querySelector('.pos-faces');
           (window.CHARACTERS || []).forEach((c, i) => {
@@ -1876,6 +1904,7 @@
         btn.addEventListener('click', () => openDemo(p.demo));
         info.appendChild(btn);
       }
+      slide.dataset.visual = p.visual || '';
       list.appendChild(slide);
       const make = VISUALS[p.visual];
       starters[i] = make ? make(slide.querySelector('.play-visual')) : null;
@@ -1913,6 +1942,7 @@
           index.querySelectorAll('.world-tab').forEach((el, idx) => {
             el.classList.toggle('is-active', idx === this.activeIndex);
           });
+          centerInBar(index, index.querySelector('.world-tab.is-active'));
           updateAccent();
           syncPlayVisual();
         },
