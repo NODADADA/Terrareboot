@@ -174,7 +174,7 @@
 
   /* 각 슬라이드 배경 톤 (플레이스홀더) */
   /* 가로 화면 배경 = 메인 영상의 첫 프레임 — 영상이 재생되기 시작해도 장면이 그대로 이어짐 */
-  .bg-main{ background: #0f0e0c url('Illust_main_video.jpg?v=20261016') center / cover no-repeat; }
+  .bg-main{ background: #0f0e0c url('Illust_main_video.jpg?v=20261017') center / cover no-repeat; }
   /* 메인 배경 영상 — 가로 화면에서만 불러옴 */
   .bg-video{
     position: absolute;
@@ -189,16 +189,22 @@
     /* 영상 속 카메라가 줌 인하므로, 배경의 등장 확대 효과(줌 아웃)와 겹쳐 흔들려 보이지 않도록 끔 */
     .bg-main, .swiper-slide-active .bg-main{ transform: none; transition: none; }
   }
+  /* 메인은 일러스트·영상이 살도록 공통으로 깔리는 어두운 막을 살짝 옅게 (로고가 놓이는 아래쪽은 거의 그대로) */
+  .bg-main::after{
+    background:
+      radial-gradient(ellipse at center, transparent 40%, rgba(0,0,0,.55) 100%),
+      linear-gradient(180deg, rgba(0,0,0,.05) 0%, rgba(0,0,0,.15) 55%, rgba(0,0,0,.55) 100%);
+  }
   @media (max-aspect-ratio: 1/1){ .bg-video{ display: none; } }
   /* 세로 화면(폰·세로 태블릿): 세로 구도 일러스트로 교체, 두 주인공이 맞부딪치는 지점을 가운데로 */
   @media (max-aspect-ratio: 1/1){
-    .bg-main{ background-image: url('Illust_mobile.jpg?v=20261016'); background-position: 58% center; }
+    .bg-main{ background-image: url('Illust_mobile.jpg?v=20261017'); background-position: 58% center; }
     /* 로고 뒤 아래쪽(주인공 옷·손 부분)이 화려해 글자가 묻히지 않도록 하단만 한 번 더 어둡게 */
     .bg-main::after{
       background:
         linear-gradient(180deg, transparent 62%, rgba(0,0,0,.55) 82%, rgba(0,0,0,.75) 100%),
-        radial-gradient(ellipse at center, transparent 30%, rgba(0,0,0,.7) 100%),
-        linear-gradient(180deg, rgba(0,0,0,.2) 0%, rgba(0,0,0,.6) 100%);
+        radial-gradient(ellipse at center, transparent 40%, rgba(0,0,0,.55) 100%),
+        linear-gradient(180deg, rgba(0,0,0,.05) 0%, rgba(0,0,0,.15) 55%, rgba(0,0,0,.55) 100%);
     }
   }
   .bg-about{ background: #0f0e0c url('Illust_about.jpg') center / cover no-repeat; }
@@ -1255,7 +1261,7 @@
       <!-- 0. 메인 -->
       <section class="swiper-slide" data-section="main">
         <div class="slide-bg bg-main">
-          <video class="bg-video" data-src="Video_main_web.mp4?v=20261016" muted loop playsinline preload="none" aria-hidden="true"></video>
+          <video class="bg-video" data-src="Video_main_web.mp4?v=20261017" muted loop playsinline preload="none" aria-hidden="true"></video>
         </div>
         <div class="slide-content">
           <h1 class="title"><img class="title-logo" src="Logo1.png" alt="Project Terra Re:Boot"><img class="title-logo title-logo-kr" src="LogoKR.png" alt="프로젝트: 테라 리부트"></h1>
