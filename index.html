@@ -175,7 +175,7 @@
   /* 각 슬라이드 배경 톤 (플레이스홀더) */
   /* 가로 화면 배경 = 메인 영상의 첫 프레임 — 영상이 재생되기 시작해도 장면이 그대로 이어짐 */
   .bg-main{ background: #0f0e0c url('Illust_main_video.jpg?v=20261017') center / cover no-repeat; }
-  /* 메인 배경 영상 — 가로 화면에서만 불러옴 */
+  /* 메인 배경 영상 — 가로 화면은 가로 영상, 세로 화면(폰)은 세로 영상을 불러옴 */
   .bg-video{
     position: absolute;
     inset: 0;
@@ -195,10 +195,11 @@
       radial-gradient(ellipse at center, transparent 40%, rgba(0,0,0,.55) 100%),
       linear-gradient(180deg, rgba(0,0,0,.05) 0%, rgba(0,0,0,.15) 55%, rgba(0,0,0,.55) 100%);
   }
-  @media (max-aspect-ratio: 1/1){ .bg-video{ display: none; } }
-  /* 세로 화면(폰·세로 태블릿): 세로 구도 일러스트로 교체, 두 주인공이 맞부딪치는 지점을 가운데로 */
+  /* 세로 화면: 배경 그림(세로 영상 첫 프레임)과 같은 위치로 잘라 재생 시작 때 장면이 튀지 않게 */
+  @media (max-aspect-ratio: 1/1){ .bg-video{ object-position: 58% center; } }
+  /* 세로 화면(폰·세로 태블릿): 세로 영상의 첫 프레임으로 교체, 두 주인공이 맞부딪치는 지점을 가운데로 */
   @media (max-aspect-ratio: 1/1){
-    .bg-main{ background-image: url('Illust_mobile.jpg?v=20261017'); background-position: 58% center; }
+    .bg-main{ background-image: url('Illust_mobile_video.jpg?v=20261017'); background-position: 58% center; }
     /* 로고 뒤 아래쪽(주인공 옷·손 부분)이 화려해 글자가 묻히지 않도록 하단만 한 번 더 어둡게 */
     .bg-main::after{
       background:
@@ -1287,7 +1288,7 @@
       <!-- 0. 메인 -->
       <section class="swiper-slide" data-section="main">
         <div class="slide-bg bg-main">
-          <video class="bg-video" data-src="Video_main_web.mp4?v=20261017" muted loop playsinline preload="none" aria-hidden="true"></video>
+          <video class="bg-video" data-src="Video_main_web.mp4?v=20261017" data-src-mobile="Video_main_mobile_web.mp4?v=20261017" muted loop playsinline preload="none" aria-hidden="true"></video>
         </div>
         <div class="slide-content">
           <h1 class="title"><img class="title-logo" src="Logo1.png" alt="Project Terra Re:Boot"><img class="title-logo title-logo-kr" src="LogoKR.png" alt="프로젝트: 테라 리부트"></h1>
@@ -2067,24 +2068,30 @@
   });
   updateAccent(); // 첫 화면(메인) 색
 
-  // 메인 배경 영상: 가로 화면에서만 불러오고(세로 폰은 세로 일러스트 유지), 메인을 벗어나면 멈춤
+  // 메인 배경 영상: 가로 화면은 가로 영상, 세로 화면(폰)은 세로 영상을 불러오고, 메인을 벗어나면 멈춤
+  const portrait = matchMedia('(max-aspect-ratio: 1/1)');
+  let mainVideoOn = false;
   function mainVideo(play){
     const v = document.querySelector('.bg-video');
-    if (!v || !matchMedia('(min-aspect-ratio: 1001/1000)').matches) return;
-    if (!v.src) {
+    if (!v) return;
+    const src = portrait.matches ? v.dataset.srcMobile : v.dataset.src;
+    if (v.dataset.cur !== src) {
       if (!play) return;
       // 배경 그림이 영상 첫 프레임과 같으므로, 재생이 시작되면 바로 바꿔도 티가 나지 않음
       v.addEventListener('playing', () => v.classList.add('is-ready'), { once: true });
-      v.src = v.dataset.src;
+      v.dataset.cur = src;
+      v.src = src;
     }
     if (play) v.play().catch(() => {});
     else v.pause();
   }
+    mainVideoOn = play;
   mainVideo(true);
 
   document.querySelectorAll('[data-goto]').forEach(el => {
     el.addEventListener('click', (e) => {
       e.preventDefault();
+      v.classList.remove('is-ready');
       const i = parseInt(el.dataset.goto, 10);
       swiper.slideTo(i);
     });
@@ -2092,6 +2099,8 @@
 
   // ---------- 테라 더스트 파티클 ----------
   // 더스트 입자가 드문드문 천천히 떠오름
+  // 화면을 돌리면 방향에 맞는 영상으로 바꿈
+  portrait.addEventListener('change', () => mainVideo(mainVideoOn));
   // 메인: 화면 왼쪽 절반은 배리어 코어 색, 오른쪽 절반은 이레이안 색 / 캐릭터: 선택한 캐릭터의 진영 색
   // 메뉴에 들어가는 순간 이미 화면에 퍼져 있도록 미리 채워 둠
   (function dust(){
