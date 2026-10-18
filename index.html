@@ -173,8 +173,8 @@
   }
 
   /* 각 슬라이드 배경 톤 (플레이스홀더) */
-  /* 가로 화면 배경 = 메인 영상의 첫 프레임 — 영상이 재생되기 시작해도 장면이 그대로 이어짐 */
-  .bg-main{ background: #0f0e0c url('Illust_main_video.jpg?v=20261017') center / cover no-repeat; }
+  /* 메인 배경은 영상만 사용 (정지 일러스트 없음) — 영상 첫 장면이 준비될 때까지는 어두운 바탕 */
+  .bg-main{ background: #0f0e0c; }
   /* 메인 배경 영상 — 가로 화면은 가로 영상, 세로 화면(폰)은 세로 영상을 불러옴 */
   .bg-video{
     position: absolute;
@@ -183,6 +183,9 @@
     height: 100%;
     object-fit: cover;
     opacity: 0;
+    transition: opacity .6s ease;
+    /* 영상 위에서 손가락으로 밀어도 메뉴가 넘어가도록 터치를 영상이 받지 않게 함 (Swiper는 video 위 터치를 무시함) */
+    pointer-events: none;
   }
   .bg-video.is-ready{ opacity: 1; }
   @media (min-aspect-ratio: 1001/1000){
@@ -195,11 +198,10 @@
       radial-gradient(ellipse at center, transparent 40%, rgba(0,0,0,.55) 100%),
       linear-gradient(180deg, rgba(0,0,0,.05) 0%, rgba(0,0,0,.15) 55%, rgba(0,0,0,.55) 100%);
   }
-  /* 세로 화면: 배경 그림(세로 영상 첫 프레임)과 같은 위치로 잘라 재생 시작 때 장면이 튀지 않게 */
+  /* 세로 화면(폰·세로 태블릿): 두 주인공이 맞부딪치는 지점을 가운데로 */
   @media (max-aspect-ratio: 1/1){ .bg-video{ object-position: 58% center; } }
-  /* 세로 화면(폰·세로 태블릿): 세로 영상의 첫 프레임으로 교체, 두 주인공이 맞부딪치는 지점을 가운데로 */
+  /* 세로 화면 */
   @media (max-aspect-ratio: 1/1){
-    .bg-main{ background-image: url('Illust_mobile_video.jpg?v=20261017'); background-position: 58% center; }
     /* 로고 뒤 아래쪽(주인공 옷·손 부분)이 화려해 글자가 묻히지 않도록 하단만 한 번 더 어둡게 */
     .bg-main::after{
       background:
@@ -268,15 +270,15 @@
   /* 메인: 로고가 일러스트 속 얼굴을 가리지 않도록 화면 아래쪽에 배치 */
   [data-section="main"]{ align-items: flex-end; }
   [data-section="main"] .slide-content{ padding-bottom: 14vh; }
-  /* 세로 화면: 일러스트 속 두 주인공 얼굴이 화면 60% 높이 언저리에 오므로, 로고를 조금 더 내려 간격을 벌림 */
-  @media (max-aspect-ratio: 1/1){ [data-section="main"] .slide-content{ padding-bottom: 10vh; } }
+  /* 세로 화면: 영상 속 두 주인공 얼굴과 떨어지도록 로고를 조금 내리되, 하단 SCROLL 표시(바닥에서 고정 높이)와는 겹치지 않게 그만큼 띄움 */
+  @media (max-aspect-ratio: 1/1){ [data-section="main"] .slide-content{ padding-bottom: calc(10vh + 56px); } }
   /* 가로 폰처럼 높이가 낮은 화면: 로고가 얼굴과 SCROLL 표시를 덮지 않도록 축소 */
   @media (max-height: 500px){
     [data-section="main"] .title-logo{ width: min(340px, 40vw); }
     /* 이 크기에선 한글이 너무 작아 읽히지 않으므로 숨기고 상단 로고의 한글로 대신함 */
     [data-section="main"] .title-logo-kr{ display: none; }
     [data-section="main"] .slide-content{ padding-bottom: 92px; }
-    .bg-main{ background-position: center 85%; }
+    .bg-video{ object-position: center 85%; }
   }
   h2.section-title{
     font-family: var(--font-head);
@@ -363,15 +365,28 @@
     pointer-events: none;
     user-select: none;
   }
+  /* 전신 일러스트: 모든 캐릭터 같은 크기 — 상단 메뉴 아래부터, 바닥에서 조금 띄운 자리까지(잘림 없음, 이미지 비율 2:3) */
   .char-art{
+    --art-bottom: 5vh; /* 발이 화면 바닥에 붙어 보이지 않도록 띄우는 높이 */
+    --art-h: calc(100vh - 110px - var(--art-bottom));
+    --art-right: 12vw;
+    --art-w: calc(var(--art-h) * 2 / 3);
     position: absolute;
-    right: 12vw;
-    bottom: -3vh;
-    height: 98vh;
+    right: var(--art-right);
+    bottom: var(--art-bottom);
+    height: var(--art-h);
     width: auto;
     max-width: none;
     filter: drop-shadow(0 0 40px rgba(0,0,0,.6));
   }
+  /* 두 장(남/여)을 나란히: 그림 양옆의 빈 공간만큼 겹쳐 놓고, 한 장일 때와 같은 자리를 중심으로 */
+  .char-art.is-pair{
+    --overlap: .38;
+    display: flex;
+    right: calc(var(--art-right) + var(--art-w) / 2 - var(--art-w) * (2 - var(--overlap)) / 2);
+  }
+  .char-art.is-pair img{ height: 100%; width: auto; flex: none; }
+  .char-art.is-pair img + img{ margin-left: calc(var(--art-w) * -1 * var(--overlap)); }
   .char-info{
     position: absolute;
     left: max(40px, 8vw);
@@ -454,7 +469,7 @@
 
   /* 캐릭터 선택 로스터 (B안) — 왼쪽 하단, 진영 사이는 파랑→금색 사선으로 구분 */
   .char-pick{
-    --cw: clamp(40px, 3.4vw, 54px);   /* 카드 폭 */
+    --cw: clamp(32px, 2.6vw, 48px);   /* 카드 폭 (가운데 SCROLL 표시에 닿지 않게) */
     position: absolute;
     left: max(40px, 8vw);
     bottom: 40px;
@@ -483,7 +498,7 @@
     flex: 0 0 2px;
     height: calc(var(--cw) * 1.65);
     margin: 0 8px;
-    background: linear-gradient(180deg, #2998FF, #C79B4A);
+    background: linear-gradient(180deg, var(--from, #2998FF), var(--to, #C79B4A)); /* 앞뒤 진영 색 */
     transform: skewX(-14deg);
   }
   .roster-card{
@@ -512,6 +527,18 @@
   }
   .roster-card:hover i,
   .roster-card.is-active i{ filter: none; }
+  /* 그림이 아직 없는 캐릭터: 얼굴 대신 이름 첫 글자 */
+  .roster-card i.is-empty,
+  .pos-face.is-empty{ display: grid; place-items: center; }
+  .roster-card i.is-empty::before,
+  .pos-face.is-empty::before{
+    content: attr(data-initial);
+    font-family: var(--font-head);
+    font-weight: 900;
+    font-size: 15px;
+    font-style: normal;
+    color: var(--fc, var(--accent));
+  }
   .roster-card.is-active{
     flex-basis: calc(var(--cw) * 1.45);
     height: calc(var(--cw) * 1.65 * 1.3);
@@ -520,7 +547,9 @@
 
   @media (max-width: 720px){
     .char-bgname{ display: none; }
-    .char-art{ right: -12vw; bottom: 0; height: 78vh; }
+    .char-art{ --art-bottom: 0px; --art-h: 78vh; --art-right: -12vw; }
+    /* 두 장(남/여)은 화면 가운데에 좀 더 겹쳐서, 머리 높이는 한 장일 때와 비슷하게 */
+    .char-art.is-pair{ --art-h: 64vh; --overlap: .45; right: calc(50% - var(--art-w) * (2 - var(--overlap)) / 2); bottom: 14vh; }
     .char-info{
       left: 0; right: 0; top: auto; bottom: 0;
       transform: none;
@@ -1423,6 +1452,16 @@
     bar.scrollTo({ left: active.offsetLeft - (bar.clientWidth - active.offsetWidth) / 2, behavior: 'smooth' });
   }
 
+  // 캐릭터 그림 목록 (image 가 한 장이면 [그림], 목록이면 그대로, 없으면 [])
+  const charImages = c => [].concat(c.image || []);
+  // 하단 목록·포지션 얼굴: 첫 번째 그림의 얼굴 부분, 그림이 없으면 이름 첫 글자
+  function setFace(el, c){
+    const src = charImages(c)[0];
+    if (src) el.style.backgroundImage = `url('${src}')`;
+    else { el.classList.add('is-empty'); el.dataset.initial = c.name.slice(0, 1); }
+    if (c.thumbPos) el.style.setProperty('--thumb-pos', c.thumbPos);
+  }
+
   // 캐릭터 슬라이드 생성
   (function buildCharacters(){
     const list = document.getElementById('char-list');
@@ -1438,9 +1477,26 @@
       slide.querySelectorAll('[data-field]').forEach(el => {
         el.textContent = c[el.dataset.field] || '';
       });
+      if (!c.quote) slide.querySelector('.char-quote').remove();
+      // 그림: 없으면 비워 두고, 두 장(남/여)이면 나란히
       const art = slide.querySelector('.char-art');
-      art.src = c.image;
-      art.alt = c.name;
+      const images = charImages(c);
+      if (!images.length) art.remove();
+      else if (images.length === 1) {
+        art.src = images[0];
+        art.alt = c.name;
+      } else {
+        const pair = document.createElement('div');
+        pair.className = 'char-art is-pair';
+        images.forEach(src => {
+          const img = art.cloneNode();
+          img.className = '';
+          img.src = src;
+          img.alt = c.name;
+          pair.appendChild(img);
+        });
+        art.replaceWith(pair);
+      }
       if (c.codename) {
         slide.querySelector('.codename').textContent =
           ` · 코드네임 ${c.codename}` + (c.codenameEn ? ` ${c.codenameEn}` : '');
@@ -1476,6 +1532,9 @@
       if (i > 0 && all[i - 1].faction !== c.faction) {
         const sep = document.createElement('span');
         sep.className = 'roster-sep';
+        const color = name => ((window.FACTIONS || {})[name] || {}).color;
+        if (color(all[i - 1].faction)) sep.style.setProperty('--from', color(all[i - 1].faction));
+        if (color(c.faction)) sep.style.setProperty('--to', color(c.faction));
         roster.appendChild(sep);
       }
       const faction = (window.FACTIONS || {})[c.faction];
@@ -1485,8 +1544,7 @@
       card.setAttribute('aria-label', c.name);
       if (faction) card.style.setProperty('--fc', faction.color);
       const face = document.createElement('i');
-      face.style.backgroundImage = `url('${c.image}')`;
-      if (c.thumbPos) face.style.setProperty('--thumb-pos', c.thumbPos);
+      setFace(face, c);
       card.appendChild(face);
       card.addEventListener('click', () => charSwiper.slideTo(i));
       roster.appendChild(card);
@@ -1683,8 +1741,7 @@
             f.className = 'pos-face';
             f.title = c.name;
             f.setAttribute('aria-label', c.name);
-            f.style.backgroundImage = `url('${c.image}')`;
-            if (c.thumbPos) f.style.setProperty('--thumb-pos', c.thumbPos);
+            setFace(f, c);
             const faction = (window.FACTIONS || {})[c.faction];
             if (faction) f.style.setProperty('--fc', faction.color);
             f.addEventListener('click', () => {
@@ -2068,30 +2125,44 @@
   });
   updateAccent(); // 첫 화면(메인) 색
 
-  // 메인 배경 영상: 가로 화면은 가로 영상, 세로 화면(폰)은 세로 영상을 불러오고, 메인을 벗어나면 멈춤
+  // 메인 배경 영상: 가로 화면은 가로 영상, 세로 화면(폰)은 세로 영상을 불러오고, 메인에 있는 동안은 늘 재생, 벗어나면 멈춤
   const portrait = matchMedia('(max-aspect-ratio: 1/1)');
   let mainVideoOn = false;
   function mainVideo(play){
+    mainVideoOn = play;
     const v = document.querySelector('.bg-video');
     if (!v) return;
     const src = portrait.matches ? v.dataset.srcMobile : v.dataset.src;
     if (v.dataset.cur !== src) {
       if (!play) return;
-      // 배경 그림이 영상 첫 프레임과 같으므로, 재생이 시작되면 바로 바꿔도 티가 나지 않음
-      v.addEventListener('playing', () => v.classList.add('is-ready'), { once: true });
+      // 첫 장면이 준비되면 어두운 바탕에서 서서히 나타남
+      v.classList.remove('is-ready');
+      v.addEventListener('loadeddata', () => v.classList.add('is-ready'), { once: true });
+      v.muted = true; // 소리 없는 영상만 자동 재생이 허용되므로 속성으로도 확실히 지정
       v.dataset.cur = src;
       v.src = src;
     }
     if (play) v.play().catch(() => {});
     else v.pause();
   }
-    mainVideoOn = play;
   mainVideo(true);
+  // 화면을 돌리면 방향에 맞는 영상으로 바꿈
+  portrait.addEventListener('change', () => mainVideo(mainVideoOn));
+  // 새 탭·백그라운드 탭으로 열었다가 돌아왔을 때, 뒤로 가기로 돌아왔을 때 다시 재생
+  document.addEventListener('visibilitychange', () => { if (!document.hidden) mainVideo(mainVideoOn); });
+  addEventListener('pageshow', () => mainVideo(mainVideoOn));
+  // 절전 모드 등으로 자동 재생이 막힌 폰: 화면을 처음 건드리는 순간 재생 (재생되면 더 이상 확인 안 함)
+  const KICK = ['touchend', 'click', 'keydown', 'wheel'];
+  function kick(){
+    const v = document.querySelector('.bg-video');
+    if (v && !v.paused) return KICK.forEach(t => document.removeEventListener(t, kick, true));
+    if (mainVideoOn) mainVideo(true);
+  }
+  KICK.forEach(t => document.addEventListener(t, kick, { capture: true, passive: true }));
 
   document.querySelectorAll('[data-goto]').forEach(el => {
     el.addEventListener('click', (e) => {
       e.preventDefault();
-      v.classList.remove('is-ready');
       const i = parseInt(el.dataset.goto, 10);
       swiper.slideTo(i);
     });
@@ -2099,8 +2170,6 @@
 
   // ---------- 테라 더스트 파티클 ----------
   // 더스트 입자가 드문드문 천천히 떠오름
-  // 화면을 돌리면 방향에 맞는 영상으로 바꿈
-  portrait.addEventListener('change', () => mainVideo(mainVideoOn));
   // 메인: 화면 왼쪽 절반은 배리어 코어 색, 오른쪽 절반은 이레이안 색 / 캐릭터: 선택한 캐릭터의 진영 색
   // 메뉴에 들어가는 순간 이미 화면에 퍼져 있도록 미리 채워 둠
   (function dust(){
