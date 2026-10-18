@@ -379,13 +379,33 @@
     max-width: none;
     filter: drop-shadow(0 0 40px rgba(0,0,0,.6));
   }
-  /* 두 장(남/여)을 나란히: 그림 양옆의 빈 공간만큼 겹쳐 놓고, 한 장일 때와 같은 자리를 중심으로 */
+  /* 두 장(지휘관 여/남)을 겹쳐서: 먼저 적은 그림이 왼쪽·앞, 두 번째가 오른쪽·뒤. 몸이 살짝 교차할 만큼 겹침,
+     한 장일 때와 같은 자리를 중심으로. 그림자는 그림마다 따로 줘서 앞사람 윤곽이 뒷사람 위에서 구분되게 */
   .char-art.is-pair{
-    --overlap: .38;
+    --overlap: .7;
     display: flex;
     right: calc(var(--art-right) + var(--art-w) / 2 - var(--art-w) * (2 - var(--overlap)) / 2);
+    filter: none;
   }
-  .char-art.is-pair img{ height: 100%; width: auto; flex: none; }
+  /* 앞에 선 사람(.is-front)은 아래쪽에 크고 선명하게, 뒤에 선 사람은 위로 물러나며 작고 흐리게 (원근감).
+     그림을 누르면 누른 사람이 앞으로 나옴 */
+  .char-art.is-pair{ cursor: pointer; }
+  .char-art.is-pair img{
+    position: relative;
+    z-index: 1;
+    height: 100%;
+    width: auto;
+    flex: none;
+    transform-origin: 50% 100%;
+    transform: translateY(-6%) scale(.94);
+    filter: drop-shadow(0 0 30px rgba(0,0,0,.65)) blur(2.5px) brightness(.55) saturate(.7);
+    transition: transform .7s cubic-bezier(.2,.7,.2,1), filter .7s ease;
+  }
+  .char-art.is-pair img.is-front{
+    z-index: 2;
+    transform: none;
+    filter: drop-shadow(0 0 30px rgba(0,0,0,.65));
+  }
   .char-art.is-pair img + img{ margin-left: calc(var(--art-w) * -1 * var(--overlap)); }
   .char-info{
     position: absolute;
@@ -548,8 +568,8 @@
   @media (max-width: 720px){
     .char-bgname{ display: none; }
     .char-art{ --art-bottom: 0px; --art-h: 78vh; --art-right: -12vw; }
-    /* 두 장(남/여)은 화면 가운데에 좀 더 겹쳐서, 머리 높이는 한 장일 때와 비슷하게 */
-    .char-art.is-pair{ --art-h: 64vh; --overlap: .45; right: calc(50% - var(--art-w) * (2 - var(--overlap)) / 2); bottom: 14vh; }
+    /* 두 장(지휘관)은 화면 가운데에, 머리 높이는 한 장일 때와 비슷하게 */
+    .char-art.is-pair{ --art-h: 64vh; right: calc(50% - var(--art-w) * (2 - var(--overlap)) / 2); bottom: 14vh; }
     .char-info{
       left: 0; right: 0; top: auto; bottom: 0;
       transform: none;
@@ -1488,12 +1508,19 @@
       } else {
         const pair = document.createElement('div');
         pair.className = 'char-art is-pair';
-        images.forEach(src => {
+        images.forEach((src, k) => {
           const img = art.cloneNode();
-          img.className = '';
+          img.className = k === 0 ? 'is-front' : '';
           img.src = src;
           img.alt = c.name;
           pair.appendChild(img);
+        });
+        // 누른 쪽 사람이 앞으로: 그림끼리 겹쳐 있어 투명한 부분까지 클릭이 잡히므로, 그림 묶음의 왼쪽 절반/오른쪽 절반으로 구분
+        pair.addEventListener('click', e => {
+          const r = pair.getBoundingClientRect();
+          const imgs = pair.querySelectorAll('img');
+          const pick = imgs[e.clientX < r.left + r.width / 2 ? 0 : imgs.length - 1];
+          imgs.forEach(img => img.classList.toggle('is-front', img === pick));
         });
         art.replaceWith(pair);
       }

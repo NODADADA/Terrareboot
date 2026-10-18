@@ -3,7 +3,7 @@
  *
  * - 순서를 바꾸면 페이지 순서도 바뀝니다. 추가/삭제도 항목 하나만 넣고 빼면 됩니다.
  * - image   : 전신 일러스트 경로 (배경이 투명한 세로 이미지 권장, 현재 1024x1536)
- *             두 장을 나란히 보여 줄 때는 ['남.webp', '여.webp'] 처럼 목록으로. '' 이면 그림 없이 표시
+ *             두 장을 겹쳐 보여 줄 때는 ['앞.webp', '뒤.webp'] 처럼 목록으로 (먼저 적은 그림이 왼쪽·앞). '' 이면 그림 없이 표시
  * - height  : 키(cm, 모자·뿔 제외) — 설정 참고용. 화면에는 쓰지 않음
  * - codename: 없으면 '' 로 두면 표시되지 않습니다.
  * - quote   : 따옴표 없이 대사만 적습니다. (따옴표는 화면에서 자동으로 붙음. '' 이면 대사 줄 없음)
@@ -23,7 +23,7 @@ window.CHARACTERS = [
     name: '지휘관', nameEn: 'Commander',
     codename: '', codenameEn: '',
     faction: '리부트', role: '지휘관',
-    image: '', // 남/여 일러스트가 준비되면 ['Character/img/Commander_M.webp', 'Character/img/Commander_F.webp']
+    image: ['Character/img/Commander_W.webp', 'Character/img/Commander_M.webp'], // 여(앞) · 남(뒤)
     quote: '',
     desc: [
       '재난 관제센터의 신입 관제관. 더스트 사태로 서울이 붕괴하던 날 무너진 학교 잔해 속에서 한 소녀를 끌어낸 것을 시작으로, 아무 능력 없이 생존한 몇 안 되는 인간이다.',
