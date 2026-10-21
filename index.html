@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Terra reboot: 테라 리부트</title>
-<meta name="description" content="Terra reboot: 테라 리부트 — 게임 소개, 캐릭터, 세계관, 플레이 정보">
+<meta name="description" content="Terra reboot: 테라 리부트 — 스토리, 캐릭터, 세계관, 게임 특징">
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -72,6 +72,8 @@
   ::selection{ background: var(--accent); color: #000; }
   /* 마지막 줄에 한 낱말만 덩그러니 남지 않도록 줄 길이를 고르게 */
   p, blockquote, dd{ text-wrap: pretty; }
+  /* 제목이 두 줄이 되면 두 줄 길이를 비슷하게 ('기억이 무기가 / 된다' → '기억이 / 무기가 된다') */
+  .world-title{ text-wrap: balance; }
   /* 대사: 문장 하나를 한 덩어리로 — 남은 자리에 안 들어가면 문장째 다음 줄로 (setQuote) */
   .sent{ display: inline-block; }
 
@@ -218,7 +220,7 @@
     }
   }
   .bg-about{ background: #0f0e0c url('Illust_about.jpg') center / cover no-repeat; }
-  /* 게임 개요는 글이 가운데에 길게 들어가므로 전체를 한 번 더 어둡게 */
+  /* 스토리는 글이 가운데에 길게 들어가므로 전체를 한 번 더 어둡게 */
   .bg-about::after{
     background:
       radial-gradient(ellipse at center, transparent 40%, rgba(15,14,12,.6) 100%),
@@ -711,7 +713,7 @@
   .world-slide.swiper-slide-active .world-info > *:nth-child(3){ transition-delay: .35s; }
   .world-slide.swiper-slide-active .world-info > *:nth-child(4){ transition-delay: .45s; }
 
-  /* 하단 목차 (STORY / REGION) */
+  /* 하단 목차 (HISTORY / REGION) */
   .world-index{
     position: absolute;
     left: max(40px, 8vw);
@@ -790,7 +792,7 @@
     .world-tab{ font-size: 13px; padding: 6px 8px; }
   }
 
-  /* ---------- 플레이 (가로 슬라이드, 데이터: Play/play.js) ---------- */
+  /* ---------- 게임 특징 (가로 슬라이드, 데이터: Play/play.js) ---------- */
   /* 지휘관의 전술 단말기(홀로그램 테이블) 느낌: 어두운 청록 바탕 + 옅은 격자 */
   .stage .play-swiper{
     position: absolute;
@@ -1176,7 +1178,7 @@
     .op-legend{ font-size: 11px; }
   }
 
-  /* ---------- 게임 개요 ---------- */
+  /* ---------- 스토리 (시놉시스) ---------- */
   .about-content{
     max-width: 820px;
     max-height: calc(100% - 200px); /* 넘치면 JS가 글자를 줄임 (fitText) */
@@ -1224,23 +1226,6 @@
     color: var(--ink);
     word-break: keep-all;
   }
-  /* 게임 정보: 마지막 문장 아래 한 줄 요약 (항목명 · 내용) */
-  .about-info{
-    margin-top: calc(22px * var(--fit, 1));
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: calc(8px * var(--fit, 1)) 28px;
-    font-size: calc(14px * var(--fit, 1));
-  }
-  .about-info div{ display: flex; align-items: baseline; gap: 10px; }
-  .about-info dt{
-    font-family: var(--font-menu);
-    font-weight: 800;
-    font-size: .85em;
-    color: var(--accent);
-  }
-  .about-info dd{ color: var(--ink); }
 
   @media (max-width: 720px){
     /* 상단 메뉴(로고+탭) 높이만큼 위아래 여백 확보 */
@@ -1345,10 +1330,10 @@
   <a href="#" class="brand" data-goto="0"><img src="Logo2.png" alt="Project Terra Re:Boot"><img class="brand-kr" src="LogoKR_s.png" alt="프로젝트: 테라 리부트"></a>
   <nav class="tabs" aria-label="주요 페이지">
     <button class="tab is-active" data-goto="0">메인</button>
-    <button class="tab" data-goto="1">게임 개요</button>
+    <button class="tab" data-goto="1">스토리</button>
     <button class="tab" data-goto="2">캐릭터</button>
     <button class="tab" data-goto="3">세계관</button>
-    <button class="tab" data-goto="4">플레이</button>
+    <button class="tab" data-goto="4">게임 특징</button>
   </nav>
 </header>
 
@@ -1366,7 +1351,7 @@
         </div>
       </section>
 
-      <!-- 1. 게임 개요 -->
+      <!-- 1. 스토리 (시놉시스) -->
       <section class="swiper-slide" data-section="about">
         <div class="slide-bg bg-about"></div>
         <div class="slide-content about-content">
@@ -1381,11 +1366,6 @@
               그들을 <strong>‘배리어 코어’</strong>라고 부른다.</p>
           </div>
           <p class="about-closing">그리고 지금─ ‘지구를 고치려는 자’들로부터 인류의 터전을 지키기 위한, 처절한 수복전이 시작된다.</p>
-          <dl class="about-info">
-            <div><dt>장르</dt><dd>턴제 RPG</dd></div>
-            <div><dt>전투</dt><dd>메모리 칩 체인 공명</dd></div>
-            <div><dt>편성</dt><dd>스트라이커 · 택티션 · 가디언</dd></div>
-          </dl>
         </div>
       </section>
 
@@ -1417,14 +1397,14 @@
         <button class="side-arrow side-next world-next" aria-label="다음 항목"><svg viewBox="0 0 22 44" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 2l18 20L2 42"/></svg></button>
       </section>
 
-      <!-- 4. 플레이 -->
+      <!-- 4. 게임 특징 -->
       <section class="swiper-slide" data-section="play">
         <div class="slide-bg bg-play"></div>
-        <!-- 플레이 슬라이드와 하단 목차는 Play/play.js 데이터로 자동 생성 -->
+        <!-- 게임 특징 슬라이드와 하단 목차는 Play/play.js 데이터로 자동 생성 -->
         <div class="swiper play-swiper">
           <div class="swiper-wrapper" id="play-list"></div>
         </div>
-        <nav class="world-index swiper-no-swiping" id="play-index" aria-label="플레이 목차"></nav>
+        <nav class="world-index swiper-no-swiping" id="play-index" aria-label="게임 특징 목차"></nav>
         <button class="side-arrow side-prev play-prev" aria-label="이전 항목"><svg viewBox="0 0 22 44" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 2 2 22l18 20"/></svg></button>
         <button class="side-arrow side-next play-next" aria-label="다음 항목"><svg viewBox="0 0 22 44" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 2l18 20L2 42"/></svg></button>
       </section>
@@ -1469,7 +1449,7 @@
   </div>
 </template>
 
-<!-- 플레이 한 장면의 화면 구조 (오른쪽 연출 .play-visual 은 visual 종류에 따라 JS가 채움) -->
+<!-- 게임 특징 한 장면의 화면 구조 (오른쪽 연출 .play-visual 은 visual 종류에 따라 JS가 채움) -->
 <template id="play-template">
   <div class="swiper-slide play-slide">
     <div class="play-info">
@@ -1490,8 +1470,8 @@
 
 <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
 <script src="Character/characters.js"></script>
-<script src="World/world.js"></script>
-<script src="Play/play.js"></script>
+<script src="World/world.js?v=20261022"></script>
+<script src="Play/play.js?v=20261022"></script>
 <script>
   // 가로로 넘치는 줄(모바일의 캐릭터 로스터·하단 목차)에서 선택된 항목이 가운데 오도록 스크롤
   function centerInBar(bar, active){
@@ -1696,7 +1676,7 @@
     });
   })();
 
-  // 플레이 슬라이드 + 하단 목차 + 오른쪽 연출 생성
+  // 게임 특징 슬라이드 + 하단 목차 + 오른쪽 연출 생성
   (function buildPlay(){
     const list = document.getElementById('play-list');
     const index = document.getElementById('play-index');
@@ -2043,11 +2023,11 @@
     });
     const group = document.createElement('span');
     group.className = 'world-group-name';
-    group.textContent = 'SYSTEM';
+    group.textContent = window.PLAY_GROUP || '';
     index.prepend(group);
     index.classList.add('world-group');
 
-    // 연출은 플레이 메뉴에서 그 슬라이드를 보고 있을 때만 돌림
+    // 연출은 게임 특징 메뉴에서 그 슬라이드를 보고 있을 때만 돌림
     let stop = null;
     window.syncPlayVisual = () => {
       if (stop) { stop(); stop = null; }
@@ -2180,7 +2160,7 @@
         });
 
         // 다른 메뉴로 넘어가면, 전환 애니메이션이 끝난 뒤 캐릭터·세계관을 첫 항목으로 되돌림
-        // → 다시 들어오면 항상 '카일', 세계관·플레이 첫 항목부터 보임
+        // → 다시 들어오면 항상 '카일', 세계관·게임 특징 첫 항목부터 보임
         clearTimeout(resetTimer);
         resetTimer = setTimeout(() => {
           const now = document.body.dataset.section;

@@ -12,8 +12,8 @@
 
 window.WORLD = [
   {
-    group: 'STORY', label: '기원',
-    kicker: 'STORY 01 · 기원',
+    group: 'HISTORY', label: '기원',
+    kicker: 'HISTORY 01 · 기원',
     title: '대분열의 시대', titleEn: '',
     image: 'World/img/Story_01.jpg',
     accent: '#F0874A', // 불타는 지구의 불씨
@@ -23,8 +23,8 @@ window.WORLD = [
     ],
   },
   {
-    group: 'STORY', label: '잃어버린 고리',
-    kicker: 'STORY 02 · 잃어버린 고리',
+    group: 'HISTORY', label: '잃어버린 고리',
+    kicker: 'HISTORY 02 · 잃어버린 고리',
     title: '공허 속의 승화', titleEn: '',
     image: 'World/img/Story_02.jpg',
     accent: '#9FB4E6', // 우주의 차가운 회청색
@@ -34,8 +34,8 @@ window.WORLD = [
     ],
   },
   {
-    group: 'STORY', label: '귀환',
-    kicker: 'STORY 03 · 귀환',
+    group: 'HISTORY', label: '귀환',
+    kicker: 'HISTORY 03 · 귀환',
     title: '오만한 정원사들', titleEn: '',
     image: 'World/img/Story_03.jpg',
     accent: '#D9B26E', // 정원사(이레이안)의 금빛
