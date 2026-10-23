@@ -12,7 +12,7 @@
 <link rel="stylesheet" as="style" crossorigin
       href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.css">
 
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11.2.10/swiper-bundle.min.css">
 
 <style>
   /* 상단 메뉴용 NanumSquare Neo (네이버 배포 웹폰트) — 받는 동안에도 메뉴 글자가 보이도록 swap */
@@ -161,6 +161,10 @@
     align-items: center;
     justify-content: center;
   }
+  /* 페이드로 겹쳐 쌓인 화면 중 보이지 않는 것은 아예 그리지 않음 (메뉴 5개 + 캐릭터 11명 + 세계관·특징이 늘 겹쳐 그려져 무거웠음).
+     visibility 는 페이드 시간(Swiper가 넣는 transition-duration) 동안 보이는 상태를 유지하다가 끝나면 숨겨짐 */
+  .swiper-fade > .swiper-wrapper > .swiper-slide{ transition-property: opacity, visibility; }
+  .swiper-fade > .swiper-wrapper > .swiper-slide:not(.swiper-slide-active){ visibility: hidden; }
 
   /* 공통 슬라이드 배경 (그라디언트로 대체 — 나중에 이미지/영상 넣으면 됨) */
   .slide-bg{
@@ -584,6 +588,8 @@
       padding: 80px 16px 150px; /* 아래 로스터 자리 확보 */
       max-height: calc(100% - 150px);
       background: linear-gradient(180deg, transparent 0%, rgba(15,14,12,.85) 30%, var(--bg) 100%);
+      /* 글 상자가 그림 아래쪽 대부분을 덮으므로, 터치는 뒤의 그림이 받게 함 (지휘관 그림을 눌러 앞뒤 바꾸기) */
+      pointer-events: none;
     }
     .char-name{ font-size: calc(2.2rem * var(--fit, 1)); }
     .char-quote{ margin-top: calc(14px * var(--fit, 1)); }
@@ -1468,7 +1474,7 @@
   <iframe title="체험판" allow="autoplay; fullscreen"></iframe>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/swiper@11.2.10/swiper-bundle.min.js"></script>
 <script src="Character/characters.js"></script>
 <script src="World/world.js?v=20261022"></script>
 <script src="Play/play.js?v=20261022"></script>
@@ -1482,9 +1488,11 @@
   // 캐릭터 그림 목록 (image 가 한 장이면 [그림], 목록이면 그대로, 없으면 [])
   const charImages = c => [].concat(c.image || []);
   // 하단 목록·포지션 얼굴: 첫 번째 그림의 얼굴 부분, 그림이 없으면 이름 첫 글자
+  // 원본 전신 그림 대신 같은 비율로 줄인 그림(img/thumb/)을 씀 — 얼굴 몇 개 때문에 원본 11장을 한꺼번에 풀지 않도록
+  const thumbOf = src => src.replace(/([^/]+)$/, 'thumb/$1');
   function setFace(el, c){
     const src = charImages(c)[0];
-    if (src) el.style.backgroundImage = `url('${src}')`;
+    if (src) el.style.backgroundImage = `url('${thumbOf(src)}')`;
     else { el.classList.add('is-empty'); el.dataset.initial = c.name.slice(0, 1); }
     if (c.thumbPos) el.style.setProperty('--thumb-pos', c.thumbPos);
   }
@@ -1498,6 +1506,24 @@
       span.className = 'sent';
       span.textContent = (i === 0 ? '“' : '') + s + (i === sents.length - 1 ? '”' : '');
       el.append(span, i < sents.length - 1 ? ' ' : '');
+    });
+  }
+
+  // 큰 그림은 보고 있는 항목과 그 앞뒤 항목만 불러옴 (data-src → src, data-bg → 배경)
+  // 처음부터 전부 불러오면 폰 메모리가 모자라 브라우저가 페이지를 새로고침함
+  function loadNear(s){
+    const n = s.slides.length;
+    [0, 1, -1].forEach(d => {
+      const slide = s.slides[(s.activeIndex + d + n) % n];
+      if (!slide) return;
+      slide.querySelectorAll('[data-src]').forEach(el => {
+        el.src = el.dataset.src;
+        el.removeAttribute('data-src');
+      });
+      slide.querySelectorAll('[data-bg]').forEach(el => {
+        el.style.backgroundImage = `url('${el.dataset.bg}')`;
+        el.removeAttribute('data-bg');
+      });
     });
   }
 
@@ -1523,7 +1549,7 @@
       const images = charImages(c);
       if (!images.length) art.remove();
       else if (images.length === 1) {
-        art.src = images[0];
+        art.dataset.src = images[0];
         art.alt = c.name;
       } else {
         const pair = document.createElement('div');
@@ -1531,7 +1557,7 @@
         images.forEach((src, k) => {
           const img = art.cloneNode();
           img.className = k === 0 ? 'is-front' : '';
-          img.src = src;
+          img.dataset.src = src;
           img.alt = c.name;
           pair.appendChild(img);
         });
@@ -1570,7 +1596,7 @@
         formatFractionCurrent: pad,
         formatFractionTotal: pad,
       },
-      on: { slideChange(){ markRoster(); updateAccent(); } },
+      on: { slideChange(){ loadNear(this); markRoster(); updateAccent(); } },
     });
 
     // 캐릭터 선택 로스터: 진영이 바뀌는 자리에 구분선
@@ -1624,7 +1650,7 @@
       });
       if (w.image) {
         slide.classList.add('has-image');
-        slide.querySelector('.world-bg').style.backgroundImage = `url('${w.image}')`;
+        slide.querySelector('.world-bg').dataset.bg = w.image;
       }
       groupCount[w.group] = (groupCount[w.group] || 0) + 1;
       slide.querySelector('.world-bgnum').textContent = String(groupCount[w.group]).padStart(2, '0');
@@ -1665,6 +1691,7 @@
       navigation: { prevEl: '.world-prev', nextEl: '.world-next' },
       on: {
         slideChange(){
+          loadNear(this);
           index.querySelectorAll('.world-tab').forEach((el, idx) => {
             el.classList.toggle('is-active', idx === this.activeIndex);
           });
@@ -2155,7 +2182,7 @@
         mainVideo(section === 'main');
         const inner = { character: charSwiper, world: worldSwiper, play: playSwiper };
         Object.entries(inner).forEach(([key, s]) => {
-          if (key === section) s.keyboard.enable();
+          if (key === section) { s.keyboard.enable(); loadNear(s); }
           else s.keyboard.disable();
         });
 
@@ -2172,6 +2199,21 @@
     },
   });
   updateAccent(); // 첫 화면(메인) 색
+
+  // 첫 화면이 다 뜬 뒤 잠시 쉬었다가, 캐릭터·세계관 첫 항목(과 앞뒤) 그림을 미리 받아 둠 → 메뉴에 들어갔을 때 바로 보임
+  addEventListener('load', () => setTimeout(() => [charSwiper, worldSwiper].forEach(loadNear), 1500));
+
+  // 손가락을 새로 댈 때마다, 지난 터치의 '끝' 신호를 놓쳐 남아 있는 Swiper 터치 기록을 지움.
+  // 기록이 남으면 Swiper가 새 터치를 '다른 손가락'으로 보고 무시해서, 새로고침 전까지 넘기기가 안 됨
+  document.addEventListener('pointerdown', e => {
+    if (!e.isPrimary) return; // 두 번째 손가락은 그대로 둠
+    [swiper, charSwiper, worldSwiper, playSwiper].forEach(s => {
+      const d = s.touchEventsData;
+      d.pointerId = null;
+      d.touchId = null;
+      d.isTouched = false;
+    });
+  }, { capture: true, passive: true });
 
   // 메인 배경 영상: 가로 화면은 가로 영상, 세로 화면(폰)은 세로 영상을 불러오고, 메인에 있는 동안은 늘 재생, 벗어나면 멈춤
   const portrait = matchMedia('(max-aspect-ratio: 1/1)');
@@ -2245,8 +2287,9 @@
       return (sprites[color] = s);
     }
     function resize(){
-      const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
       W = innerWidth; H = innerHeight; mobile = W <= 720;
+      // 흐린 빛 점이라 해상도를 낮춰도 티가 안 남 — 폰은 1배로 그려 매 프레임 칠하는 양을 줄임
+      const dpr = Math.min(window.devicePixelRatio || 1, mobile ? 1 : 1.5);
       canvas.width = W * dpr; canvas.height = H * dpr;
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     }
