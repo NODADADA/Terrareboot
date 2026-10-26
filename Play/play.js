@@ -75,7 +75,7 @@ window.PLAY = [
   {
     label: '전투 역할',
     kicker: 'FEATURE 04',
-    title: '역할군', titleEn: 'Position',
+    title: '전투 역할', titleEn: 'Position',
     headline: '조합을 맞춰 팀을 운용하자',
     accent: '#A99BFF',
     visual: 'positions',
