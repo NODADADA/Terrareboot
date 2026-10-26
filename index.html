@@ -8,19 +8,19 @@
 
 <!-- 링크 미리보기 (카카오톡·디스코드·X 등). 이미지는 전체 주소여야 함. 바꾼 뒤 카톡은 '카카오 공유 디버거'에서 캐시 초기화 -->
 <meta property="og:type" content="website">
-<meta property="og:site_name" content="Project:Terra Reboot">
+<meta property="og:site_name" content="Terra reboot: 테라 리부트">
 <meta property="og:url" content="https://nodadada.github.io/Terrareboot/">
-<meta property="og:title" content="Project:Terra Reboot">
+<meta property="og:title" content="Terra reboot: 테라 리부트">
 <meta property="og:description" content="2099년의 지구를 두고 벌이는 전략 RPG.">
-<meta property="og:image" content="https://nodadada.github.io/Terrareboot/og-image.jpg">
+<meta property="og:image" content="https://nodadada.github.io/Terrareboot/og-image.jpg?v=2">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
-<meta property="og:image:alt" content="Project:Terra Reboot 키 비주얼">
+<meta property="og:image:alt" content="Project:Terra Reboot 로고와 키 비주얼">
 <meta property="og:locale" content="ko_KR">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Project:Terra Reboot">
+<meta name="twitter:title" content="Terra reboot: 테라 리부트">
 <meta name="twitter:description" content="2099년의 지구를 두고 벌이는 전략 RPG.">
-<meta name="twitter:image" content="https://nodadada.github.io/Terrareboot/og-image.jpg">
+<meta name="twitter:image" content="https://nodadada.github.io/Terrareboot/og-image.jpg?v=2">
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -1506,9 +1506,9 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/swiper@11.2.10/swiper-bundle.min.js"></script>
-<script src="Character/characters.js?v=20261026"></script>
-<script src="World/world.js?v=20261026"></script>
-<script src="Play/play.js?v=20261026"></script>
+<script src="Character/characters.js?v=20261027"></script>
+<script src="World/world.js?v=20261027"></script>
+<script src="Play/play.js?v=20261027"></script>
 <script>
   // 가로로 넘치는 줄(모바일의 캐릭터 로스터·하단 목차)에서 선택된 항목이 가운데 오도록 스크롤
   function centerInBar(bar, active){
@@ -2186,6 +2186,12 @@
   }
 
   let resetTimer;
+  // 메뉴 안 항목을 첫 번째로 되돌리고, 모바일 하단 줄(로스터·목차)도 맨 왼쪽부터 보이게 함
+  const BARS = { character: 'char-roster', world: 'world-index', play: 'play-index' };
+  function resetInner(key, s){
+    if (s.activeIndex !== 0) s.slideTo(0, 0);
+    document.getElementById(BARS[key]).scrollTo({ left: 0, behavior: 'instant' });
+  }
   const swiper = new Swiper('.stage > .swiper', {
     direction: 'vertical',
     effect: 'fade',
@@ -2215,7 +2221,7 @@
         Object.entries(inner).forEach(([key, s]) => {
           if (key === section) {
             // 들어올 때도 첫 항목인지 한 번 더 확인 (나갈 때 되돌리기가 빠졌더라도 항상 첫 항목부터)
-            if (s.activeIndex !== 0) s.slideTo(0, 0);
+            resetInner(key, s);
             s.keyboard.enable(); loadNear(s);
           }
           else s.keyboard.disable();
@@ -2227,7 +2233,7 @@
         resetTimer = setTimeout(() => {
           const now = document.body.dataset.section;
           Object.entries(inner).forEach(([key, s]) => {
-            if (key !== now && s.activeIndex !== 0) s.slideTo(0, 0);
+            if (key !== now) resetInner(key, s);
           });
         }, this.params.speed);
       },
