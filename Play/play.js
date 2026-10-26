@@ -3,7 +3,8 @@
  *
  * - label : 하단 목차에 보이는 짧은 이름
  * - kicker: 제목 위 작은 글씨
- * - title / titleEn : 제목 / 영문 제목
+ * - title / titleEn : 제목 / 영문 제목 (한 줄에 들어가는 짧은 이름)
+ * - headline: 제목 아래 한 줄 문구 (긴 홍보 문구는 여기에)
  * - accent: 이 슬라이드를 보는 동안의 강조색 (상단 메뉴 밑줄, 라벨, 칩 빛 등)
  * - desc  : 문단 하나당 문자열 하나
  * - visual: 오른쪽 연출 종류 — 'positions' | 'chain' | 'command' | 'map' (모양은 index.html 에서 만듦)
@@ -23,37 +24,41 @@ window.POSITIONS = [
 ];
 
 // 하단 목차 맨 앞에 붙는 묶음 이름 — 게임 장르를 함께 보여 줌
-window.PLAY_GROUP = '턴제 RPG';
+window.PLAY_GROUP = 'PLAY';
 
-// 게임 특징: [한 줄 제목] + 두 문장 + 오른쪽 연출 하나. 규칙 설명보다 '이야기와 어떻게 이어지는지'를 중심으로
+// 게임 특징: [한 줄 제목] + 설명 + 오른쪽 연출 하나 (문구 원본: Play/play.txt)
 window.PLAY = [
   {
-    label: '메모리 칩',
+    label: '태그공명',
     kicker: 'FEATURE 01',
-    title: '기억이 무기가 된다', titleEn: 'Memory Chip',
+    title: '태그공명', titleEn: 'Tag Resonance',
+    headline: '메모리 칩의 태그를 공명시켜라',
     accent: '#5FD3E6',
     visual: 'chain',
     demo: '',
     desc: [
-      '코어에 각인된 기억은 전투에서 ‘메모리 칩’으로 깨어난다.',
-      '같은 기억을 품은 칩이 나란히 이어지면 공명이 일어나고, 세 개가 하나로 이어지는 순간 결정타가 터진다.',
+      '지휘관의 전술 단말기 위에서, 배리어 코어와 이레이안의 전투 능력은 모두 같은 규격의 ‘메모리 칩’으로 펼쳐진다. 칩마다 새겨진 고유 태그가 전략의 축이 된다.',
+      '손에 쥔 칩 중 이웃한 칩의 태그가 같으면 데이터 링크가 빛나며 공명한다. 공명한 칩을 합칠수록 랭크가 오르고, 위력과 연출도 함께 강해진다.',
     ],
+    steps: ['1 RANK', '2 RANK', '3 RANK'],
   },
   {
-    label: '지휘관',
+    label: '지휘관 스킬',
     kicker: 'FEATURE 02',
-    title: '무력한 인간, 지휘관', titleEn: 'Commander',
+    title: '지휘관 스킬', titleEn: 'Commander Skill',
+    headline: '지휘관이 되어 전황을 뒤집어라',
     accent: '#7FB8FF',
     visual: 'command',
     desc: [
-      '플레이어는 아무 능력 없이 살아남은 인간, 지휘관이 되어 코어들을 이끈다.',
-      '패가 꼬인 순간 직접 전장에 개입해 칩의 태그를 바꾸고, 끊어진 공명을 다시 잇는다.',
+      '체인을 성공시키거나 적을 쓰러뜨릴 때마다 CP(지휘력) 게이지가 차오른다.',
+      '모은 CP로 칩에 원하는 태그를 새기거나, 기울어진 전황을 단숨에 뒤집어라.',
     ],
   },
   {
-    label: '수복 작전',
+    label: '노드 점령',
     kicker: 'FEATURE 03',
-    title: '되찾는 만큼 나아간다', titleEn: 'Restoration',
+    title: '노드 점령', titleEn: 'Node Capture',
+    headline: '나아가며 되찾아라',
     accent: '#6FD6B0',
     visual: 'map',
     desc: [

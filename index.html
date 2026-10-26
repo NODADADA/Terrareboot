@@ -4,13 +4,29 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Terra reboot: 테라 리부트</title>
-<meta name="description" content="Terra reboot: 테라 리부트 — 스토리, 캐릭터, 세계관, 게임 특징">
+<meta name="description" content="2099년의 지구를 두고 벌이는 전략 RPG.">
+
+<!-- 링크 미리보기 (카카오톡·디스코드·X 등). 이미지는 전체 주소여야 함. 바꾼 뒤 카톡은 '카카오 공유 디버거'에서 캐시 초기화 -->
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Project:Terra Reboot">
+<meta property="og:url" content="https://nodadada.github.io/Terrareboot/">
+<meta property="og:title" content="Project:Terra Reboot">
+<meta property="og:description" content="2099년의 지구를 두고 벌이는 전략 RPG.">
+<meta property="og:image" content="https://nodadada.github.io/Terrareboot/og-image.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Project:Terra Reboot 키 비주얼">
+<meta property="og:locale" content="ko_KR">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Project:Terra Reboot">
+<meta name="twitter:description" content="2099년의 지구를 두고 벌이는 전략 RPG.">
+<meta name="twitter:image" content="https://nodadada.github.io/Terrareboot/og-image.jpg">
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&family=Nanum+Myeongjo:wght@800&family=Rajdhani:wght@600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" as="style" crossorigin
-      href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.css">
+      href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.css">
 
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11.2.10/swiper-bundle.min.css">
 
@@ -820,6 +836,19 @@
     text-shadow: 0 1px 12px rgba(0,0,0,.6);
   }
   .play-info .world-desc p{ word-break: keep-all; }
+  /* 큰 제목은 다른 메뉴처럼 짧은 이름 한 줄, 긴 문구는 그 아래 한 단계 작은 글씨로 */
+  .play-headline{
+    margin-top: calc(20px * var(--fit, 1));
+    padding-left: 12px;
+    border-left: 2px solid var(--accent);
+    font-family: var(--font-head);
+    font-weight: 700;
+    font-size: calc(clamp(1.1rem, 1.5vw, 1.35rem) * var(--fit, 1));
+    line-height: 1.4;
+    color: var(--ink);
+    word-break: keep-all;
+  }
+  .play-headline + .world-desc{ margin-top: calc(16px * var(--fit, 1)); }
   .play-steps{
     display: flex;
     flex-wrap: wrap;
@@ -894,6 +923,7 @@
   .play-slide.swiper-slide-active .play-info > *:nth-child(3){ transition-delay: .35s; }
   .play-slide.swiper-slide-active .play-info > *:nth-child(4){ transition-delay: .45s; }
   .play-slide.swiper-slide-active .play-info > *:nth-child(5){ transition-delay: .55s; }
+  .play-slide.swiper-slide-active .play-info > *:nth-child(6){ transition-delay: .65s; }
   body[data-section="play"] .scroll-hint{ opacity: 0; }
 
   /* 홀로그램 패널 공통: 유리판 + 모서리 깎기 */
@@ -1462,6 +1492,7 @@
       <div class="world-kicker" data-field="kicker"></div>
       <h3 class="world-title" data-field="title"></h3>
       <div class="world-title-en" data-field="titleEn"></div>
+      <p class="play-headline" data-field="headline"></p>
       <div class="world-desc"></div>
     </div>
     <div class="play-visual" aria-hidden="true"></div>
@@ -1475,9 +1506,9 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/swiper@11.2.10/swiper-bundle.min.js"></script>
-<script src="Character/characters.js"></script>
-<script src="World/world.js?v=20261022"></script>
-<script src="Play/play.js?v=20261022"></script>
+<script src="Character/characters.js?v=20261026"></script>
+<script src="World/world.js?v=20261026"></script>
+<script src="Play/play.js?v=20261026"></script>
 <script>
   // 가로로 넘치는 줄(모바일의 캐릭터 로스터·하단 목차)에서 선택된 항목이 가운데 오도록 스크롤
   function centerInBar(bar, active){
@@ -2008,14 +2039,14 @@
         el.textContent = text;
         desc.appendChild(el);
       });
-      if (p.steps) { // 턴 흐름: 체인 공명이 일어나는 '전술' 단계를 강조
+      if (p.steps) { // 단계 표시: 마지막 단계(최고 랭크)를 강조
         const ol = document.createElement('ol');
         ol.className = 'play-steps';
         p.steps.forEach((s, k) => {
           if (k) ol.insertAdjacentHTML('beforeend', '<span class="arrow" aria-hidden="true">▶</span>');
           const li = document.createElement('li');
           li.textContent = s;
-          if (s === '전술') li.className = 'is-key';
+          if (k === p.steps.length - 1) li.className = 'is-key';
           ol.appendChild(li);
         });
         info.appendChild(ol);
@@ -2182,7 +2213,11 @@
         mainVideo(section === 'main');
         const inner = { character: charSwiper, world: worldSwiper, play: playSwiper };
         Object.entries(inner).forEach(([key, s]) => {
-          if (key === section) { s.keyboard.enable(); loadNear(s); }
+          if (key === section) {
+            // 들어올 때도 첫 항목인지 한 번 더 확인 (나갈 때 되돌리기가 빠졌더라도 항상 첫 항목부터)
+            if (s.activeIndex !== 0) s.slideTo(0, 0);
+            s.keyboard.enable(); loadNear(s);
+          }
           else s.keyboard.disable();
         });
 
@@ -2288,8 +2323,8 @@
     }
     function resize(){
       W = innerWidth; H = innerHeight; mobile = W <= 720;
-      // 흐린 빛 점이라 해상도를 낮춰도 티가 안 남 — 폰은 1배로 그려 매 프레임 칠하는 양을 줄임
-      const dpr = Math.min(window.devicePixelRatio || 1, mobile ? 1 : 1.5);
+      // 흐린 빛 점이라 해상도를 낮춰도 티가 안 남 — 1배로 그려 매 프레임 칠하는 양을 줄임 (PC 큰 화면은 1.5배면 칠할 점이 2.25배)
+      const dpr = 1;
       canvas.width = W * dpr; canvas.height = H * dpr;
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     }
@@ -2321,8 +2356,11 @@
         r: .6 + Math.random() * 1.4, sway: Math.random() * 6.28,
       });
     }
-    function tick(){
-      if (!document.hidden) { // 다른 탭으로 나가 있으면 멈춤
+    // 고주사율 모니터(120·144Hz)에서도 초당 약 60번만 그림 — 움직임이 프레임 단위라 그대로 두면 입자가 빨라지고 일도 두 배
+    let lastDraw = 0;
+    function tick(t){
+      if (t - lastDraw >= 1000 / 75 && !document.hidden) { // 다른 탭으로 나가 있으면 멈춤
+        lastDraw = t;
         const now = section(), main = now === 'main';
         if (now !== lastSection) { // 메뉴가 바뀌면 그 메뉴에 맞게 바로 채움
           motes = [];
