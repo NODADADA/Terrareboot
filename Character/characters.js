@@ -4,6 +4,9 @@
  * - 순서를 바꾸면 페이지 순서도 바뀝니다. 추가/삭제도 항목 하나만 넣고 빼면 됩니다.
  * - image   : 전신 일러스트 경로 (배경이 투명한 세로 이미지 권장, 현재 1024x1536)
  *             두 장을 겹쳐 보여 줄 때는 ['앞.webp', '뒤.webp'] 처럼 목록으로 (먼저 적은 그림이 왼쪽·앞). '' 이면 그림 없이 표시
+ * - roster  : 하단 캐릭터 토글 썸네일(300x450, 배경 투명). 없으면 img/roster/ 의 첫 그림과 같은 이름 파일
+ * - thumb   : 전투 역할 원형 얼굴 썸네일(300x450). 없으면 img/thumb/ 의 첫 그림과 같은 이름 파일
+ * - facePos : 전투 역할 원형 얼굴 위치 'x% y%' (썸네일을 1.7배로 키운 뒤의 위치, 기본 50% 50%)
  * - height  : 키(cm, 모자·뿔 제외) — 설정 참고용. 화면에는 쓰지 않음
  * - codename: 없으면 '' 로 두면 표시되지 않습니다.
  * - quote   : 따옴표 없이 대사만 적습니다. (따옴표는 화면에서 자동으로 붙음. '' 이면 대사 줄 없음)
@@ -24,6 +27,8 @@ window.CHARACTERS = [
     codename: '', codenameEn: '',
     faction: '리부트', role: '지휘관',
     image: ['Character/img/Commander_W.webp', 'Character/img/Commander_M.webp'], // 여(앞) · 남(뒤)
+    roster: 'Character/img/roster/commander.webp',
+    thumb: 'Character/img/thumb/commander.webp', facePos: '0% 57%',
     quote: '',
     desc: [
       '재난 관제센터의 신입 관제관. 더스트 사태로 서울이 붕괴하던 날 무너진 학교 잔해 속에서 한 소녀를 끌어낸 것을 시작으로, 아무 능력 없이 생존한 몇 안 되는 인간이다.',
@@ -35,6 +40,7 @@ window.CHARACTERS = [
     codename: '브레이커', codenameEn: 'Breaker',
     faction: '배리어 코어', role: '스트라이커', height: 176,
     image: 'Character/img/Kyle.webp',
+    facePos: '55% 34%',
     quote: '지구를 고친다고? 웃기지 마. 여긴 우리의 땅이다.',
     desc: [
       '더스트 참사 당시 침식에 노출되었으나, 코어 적합자로 각성하며 살아남았다. 그러나 마수로 변이한 가족이 마지막으로 남은 생존자인 린마저 공격하려 하자, 그녀를 지키기 위해 자신의 손으로 가족을 처치해야 했다.',
@@ -47,6 +53,7 @@ window.CHARACTERS = [
     codename: '펄스', codenameEn: 'Pulse',
     faction: '배리어 코어', role: '택티션', height: 160,
     image: 'Character/img/Rin.webp',
+    facePos: '50% 45%',
     quote: '카일! 또 혼자 뛰쳐나갔지? 그러다 죽어도 아는 척 안 할 거야!',
     desc: [
       '카일의 소꿉친구이자, 더스트 참사로 고향을 잃은 생존자. 참사 당시 카일에게 구출되었으나, 두 사람의 가족이 모두 목숨을 잃었다는 사실을 확인한 순간 코어 적합자로 각성했다. 각성 당시 치유 능력뿐만 아니라 신체 능력도 강화되어, 무거운 쌍권총을 자유자재로 다룬다.',
@@ -58,6 +65,7 @@ window.CHARACTERS = [
     codename: '바스티온', codenameEn: 'Bastion',
     faction: '배리어 코어', role: '가디언', height: 195,
     image: 'Character/img/Hyunwoo.webp',
+    facePos: '50% 30%',
     quote: '내 뒤에 서라. 죽기 싫으면.',
     desc: [
       '서울이 붕괴되던 날, 가족을 지키지 못했다는 죄책감을 안고 살아남은 생존자.',
@@ -70,6 +78,7 @@ window.CHARACTERS = [
     codename: '플래너', codenameEn: 'Planner',
     faction: '배리어 코어', role: '택티션', height: 156,
     image: 'Character/img/Daye.webp',
+    facePos: '31% 40%',
     quote: '제가... 계산해봤는데요. 이게 유일한 방법이에요.',
     desc: [
       '평범한 고등학생이었으나, 더스트 사태 당시 무너진 학교 잔해에 깔려 죽어가던 중 각성했다. 뺨과 목덜미에 더스트 침식 흔적이 남아있어 항상 후드를 뒤집어쓰고 다닌다.',
@@ -82,6 +91,7 @@ window.CHARACTERS = [
     codename: '보이저', codenameEn: 'Voyager',
     faction: '배리어 코어', role: '스트라이커', height: 162,
     image: 'Character/img/Kaname.webp',
+    facePos: '45% 45%',
     quote: '와, 봤어? 방금 내 주먹에 불꽃 튀는 거! 대박!',
     desc: [
       '일본 출신의 자유분방한 격투가. 어릴 적부터 세계 일주를 꿈꾸며 각국의 무술을 영상으로 익혔지만, 더스트 참사로 그 꿈은 이루어질 수 없는 듯했다. 그러나 그녀는 멸망한 세계에서도 새로운 모험의 가능성을 발견하고, 주저 없이 길을 나섰다.',
@@ -93,6 +103,7 @@ window.CHARACTERS = [
     codename: '', codenameEn: '',
     faction: '이레이안', role: '택티션', height: 178,
     image: 'Character/img/Esthel.webp',
+    facePos: '53% 24%',
     quote: '이해하지 못하는 모양이시군요. 자신이 병들었다는 사실을.',
     desc: [
       '이레이안 원정대의 고위 집행관이자, 아크(Ark)의 질서를 수호하는 관리자.',
@@ -104,7 +115,8 @@ window.CHARACTERS = [
     name: '리브', nameEn: 'Lib',
     codename: '', codenameEn: '',
     faction: '이레이안', role: '스트라이커', height: 147,
-    image: 'Character/img/Lib.webp',
+    image: 'Character/img/Lib.webp?v=20261103',
+    facePos: '45% 46%',
     quote: '주제도 모르는 잡초들이... 감히 에스텔 님의 정원에 발을 들여?',
     desc: [
       '이레이안 원정대의 최연소 간부이자, 에스텔의 직속 보좌관. 본래 아크의 기록 관리자였으나, 에스텔의 사상에 매료되어 그를 맹목적으로 추종하게 되었다.',
@@ -116,6 +128,7 @@ window.CHARACTERS = [
     codename: '', codenameEn: '',
     faction: '이레이안', role: '택티션', height: 197,
     image: 'Character/img/Klaus.webp',
+    facePos: '50% 26%',
     quote: '싸움은 야만인들이나 하는 거죠. 저는... 관리를 할 뿐입니다.',
     desc: [
       '이레이안의 군사 조직 \'노바 질서 수호대\'의 총대장. 테라 노바의 치안을 담당하지만, 그의 진짜 관심사는 생명 공학이다. 그는 직접 주먹을 휘두르거나 마법을 쓰는 것을 천박하게 여기며, 자신이 만든 작품들이 적을 유린하는 것을 감상하는 것을 즐긴다.',
@@ -127,6 +140,7 @@ window.CHARACTERS = [
     codename: '', codenameEn: '',
     faction: '이레이안', role: '스트라이커', height: 176,
     image: 'Character/img/Silvia.webp',
+    facePos: '45% 29%',
     quote: '자, 대련입니다.',
     desc: [
       '이레이안 내에서도 소수파인 근접 전투를 숭상하는 가문 출신. 그녀는 원거리에서 일방적으로 학살하는 것을 미학이 없다고 여긴다. 적의 눈을 보고, 칼끝으로 생명이 꺼지는 것을 느끼는 것이야말로 진정한 \'정화\'라고 믿는다.',
